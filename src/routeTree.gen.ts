@@ -17,6 +17,8 @@ import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ActualitesRouteImport } from './routes/actualites'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MembreIndexRouteImport } from './routes/membre/index'
+import { Route as MembreCarteRouteImport } from './routes/membre/carte'
 
 const OpportunitesRoute = OpportunitesRouteImport.update({
   id: '/opportunites',
@@ -58,6 +60,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MembreIndexRoute = MembreIndexRouteImport.update({
+  id: '/membre/',
+  path: '/membre/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MembreCarteRoute = MembreCarteRouteImport.update({
+  id: '/membre/carte',
+  path: '/membre/carte',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -68,6 +80,8 @@ export interface FileRoutesByFullPath {
   '/inscription': typeof InscriptionRoute
   '/login': typeof LoginRoute
   '/opportunites': typeof OpportunitesRoute
+  '/membre/carte': typeof MembreCarteRoute
+  '/membre/': typeof MembreIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -78,6 +92,8 @@ export interface FileRoutesByTo {
   '/inscription': typeof InscriptionRoute
   '/login': typeof LoginRoute
   '/opportunites': typeof OpportunitesRoute
+  '/membre/carte': typeof MembreCarteRoute
+  '/membre': typeof MembreIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -89,6 +105,8 @@ export interface FileRoutesById {
   '/inscription': typeof InscriptionRoute
   '/login': typeof LoginRoute
   '/opportunites': typeof OpportunitesRoute
+  '/membre/carte': typeof MembreCarteRoute
+  '/membre/': typeof MembreIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -101,6 +119,8 @@ export interface FileRouteTypes {
     | '/inscription'
     | '/login'
     | '/opportunites'
+    | '/membre/carte'
+    | '/membre/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -111,6 +131,8 @@ export interface FileRouteTypes {
     | '/inscription'
     | '/login'
     | '/opportunites'
+    | '/membre/carte'
+    | '/membre'
   id:
     | '__root__'
     | '/'
@@ -121,6 +143,8 @@ export interface FileRouteTypes {
     | '/inscription'
     | '/login'
     | '/opportunites'
+    | '/membre/carte'
+    | '/membre/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -132,6 +156,8 @@ export interface RootRouteChildren {
   InscriptionRoute: typeof InscriptionRoute
   LoginRoute: typeof LoginRoute
   OpportunitesRoute: typeof OpportunitesRoute
+  MembreCarteRoute: typeof MembreCarteRoute
+  MembreIndexRoute: typeof MembreIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -192,6 +218,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/membre/': {
+      id: '/membre/'
+      path: '/membre'
+      fullPath: '/membre/'
+      preLoaderRoute: typeof MembreIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/membre/carte': {
+      id: '/membre/carte'
+      path: '/membre/carte'
+      fullPath: '/membre/carte'
+      preLoaderRoute: typeof MembreCarteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -204,6 +244,8 @@ const rootRouteChildren: RootRouteChildren = {
   InscriptionRoute: InscriptionRoute,
   LoginRoute: LoginRoute,
   OpportunitesRoute: OpportunitesRoute,
+  MembreCarteRoute: MembreCarteRoute,
+  MembreIndexRoute: MembreIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
