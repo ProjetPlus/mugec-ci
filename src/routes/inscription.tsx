@@ -131,9 +131,9 @@ function Page() {
     <div className="min-h-screen bg-background">
       <SiteHeader />
       <section className="container mx-auto max-w-3xl px-4 py-12">
-        <h1 className="text-3xl font-bold tracking-tight">Formulaire d'adhésion</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Formulaire d'inscription</h1>
         <p className="mt-2 text-muted-foreground">
-          Étape {step} sur 3 — durée moyenne 5 minutes. Frais d'adhésion : <strong>5 000 FCFA</strong>.
+          Étape {step} sur 3 — durée moyenne 5 minutes. Frais d'inscription : <strong>5 000 FCFA</strong>.
         </p>
 
         <div className="mt-6">
