@@ -10,6 +10,8 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as OpportunitesRouteImport } from './routes/opportunites'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as InscriptionRouteImport } from './routes/inscription'
 import { Route as ForumRouteImport } from './routes/forum'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -19,6 +21,16 @@ import { Route as IndexRouteImport } from './routes/index'
 const OpportunitesRoute = OpportunitesRouteImport.update({
   id: '/opportunites',
   path: '/opportunites',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InscriptionRoute = InscriptionRouteImport.update({
+  id: '/inscription',
+  path: '/inscription',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForumRoute = ForumRouteImport.update({
@@ -53,6 +65,8 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/forum': typeof ForumRoute
+  '/inscription': typeof InscriptionRoute
+  '/login': typeof LoginRoute
   '/opportunites': typeof OpportunitesRoute
 }
 export interface FileRoutesByTo {
@@ -61,6 +75,8 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/forum': typeof ForumRoute
+  '/inscription': typeof InscriptionRoute
+  '/login': typeof LoginRoute
   '/opportunites': typeof OpportunitesRoute
 }
 export interface FileRoutesById {
@@ -70,6 +86,8 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/forum': typeof ForumRoute
+  '/inscription': typeof InscriptionRoute
+  '/login': typeof LoginRoute
   '/opportunites': typeof OpportunitesRoute
 }
 export interface FileRouteTypes {
@@ -80,9 +98,19 @@ export interface FileRouteTypes {
     | '/contact'
     | '/faq'
     | '/forum'
+    | '/inscription'
+    | '/login'
     | '/opportunites'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/actualites' | '/contact' | '/faq' | '/forum' | '/opportunites'
+  to:
+    | '/'
+    | '/actualites'
+    | '/contact'
+    | '/faq'
+    | '/forum'
+    | '/inscription'
+    | '/login'
+    | '/opportunites'
   id:
     | '__root__'
     | '/'
@@ -90,6 +118,8 @@ export interface FileRouteTypes {
     | '/contact'
     | '/faq'
     | '/forum'
+    | '/inscription'
+    | '/login'
     | '/opportunites'
   fileRoutesById: FileRoutesById
 }
@@ -99,6 +129,8 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   FaqRoute: typeof FaqRoute
   ForumRoute: typeof ForumRoute
+  InscriptionRoute: typeof InscriptionRoute
+  LoginRoute: typeof LoginRoute
   OpportunitesRoute: typeof OpportunitesRoute
 }
 
@@ -109,6 +141,20 @@ declare module '@tanstack/react-router' {
       path: '/opportunites'
       fullPath: '/opportunites'
       preLoaderRoute: typeof OpportunitesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inscription': {
+      id: '/inscription'
+      path: '/inscription'
+      fullPath: '/inscription'
+      preLoaderRoute: typeof InscriptionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/forum': {
@@ -155,6 +201,8 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   FaqRoute: FaqRoute,
   ForumRoute: ForumRoute,
+  InscriptionRoute: InscriptionRoute,
+  LoginRoute: LoginRoute,
   OpportunitesRoute: OpportunitesRoute,
 }
 export const routeTree = rootRouteImport
