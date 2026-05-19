@@ -89,10 +89,11 @@ function Index() {
       <section className="container mx-auto max-w-7xl px-4 py-20">
         <div className="mb-12 text-center">
           <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
-            Tous vos services en un seul endroit
+            Tous vos services en un seul espace
           </h2>
           <p className="mt-3 text-muted-foreground">
-            Une plateforme moderne pensée pour les agents des collectivités territoriales.
+            La MUGEC-CI met à votre disposition une plateforme moderne, conçue pour vous, agents
+            des collectivités territoriales.
           </p>
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
