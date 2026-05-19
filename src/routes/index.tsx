@@ -18,12 +18,12 @@ const stats = [
 ];
 
 const features = [
-  { icon: Users, title: "Adhésion 100% en ligne", desc: "Formulaire en 3 étapes, paiement mobile et validation automatique." },
-  { icon: Wallet, title: "Cotisations simplifiées", desc: "Orange Money, MTN MoMo, Wave et Moov en temps réel." },
-  { icon: FileBadge, title: "Fiche & carte de membre", desc: "Documents officiels téléchargeables au format PDF." },
-  { icon: ShieldCheck, title: "Espace sécurisé", desc: "Vos données personnelles et documents protégés." },
-  { icon: Bell, title: "Notifications", desc: "Rappels par SMS, WhatsApp et e-mail." },
-  { icon: Smartphone, title: "Accessible partout", desc: "Plateforme responsive, consultable hors-ligne." },
+  { icon: Users, title: "Inscription 100% en ligne", desc: "Inscrivez-vous en 3 étapes, payez par mobile money et recevez votre validation automatiquement." },
+  { icon: Wallet, title: "Vos cotisations simplifiées", desc: "Réglez vos cotisations via Orange Money, MTN MoMo, Wave ou Moov, en temps réel." },
+  { icon: FileBadge, title: "Votre fiche & carte de membre", desc: "Téléchargez vos documents officiels au format PDF, signés par la MUGEC-CI." },
+  { icon: ShieldCheck, title: "Un espace sécurisé", desc: "Vos données personnelles et vos documents sont protégés et chiffrés." },
+  { icon: Bell, title: "Restez informé(e)", desc: "Recevez vos rappels et notifications par SMS, WhatsApp et e-mail." },
+  { icon: Smartphone, title: "Accessible partout", desc: "Une plateforme responsive, consultable depuis votre téléphone, où que vous soyez." },
 ];
 
 function Index() {
@@ -51,13 +51,14 @@ function Index() {
               <span className="text-accent">numérique</span>.
             </h1>
             <p className="mt-6 max-w-xl text-lg text-muted-foreground">
-              Adhérez en ligne, gérez vos cotisations, téléchargez votre carte de membre et restez
-              connecté à votre mutuelle, où que vous soyez.
+              Bienvenue sur votre plateforme officielle. Inscrivez-vous en ligne, réglez vos
+              cotisations, téléchargez votre carte de membre et restez connecté(e) à votre
+              mutuelle, où que vous soyez.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg">
                 <Link to="/inscription">
-                  Adhérer maintenant <ArrowRight className="ml-2 h-4 w-4" />
+                  M'inscrire en ligne <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg">
@@ -88,10 +89,11 @@ function Index() {
       <section className="container mx-auto max-w-7xl px-4 py-20">
         <div className="mb-12 text-center">
           <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
-            Tous vos services en un seul endroit
+            Tous vos services en un seul espace
           </h2>
           <p className="mt-3 text-muted-foreground">
-            Une plateforme moderne pensée pour les agents des collectivités territoriales.
+            La MUGEC-CI met à votre disposition une plateforme moderne, conçue pour vous, agents
+            des collectivités territoriales.
           </p>
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -112,13 +114,13 @@ function Index() {
       {/* CTA */}
       <section className="container mx-auto max-w-7xl px-4 pb-20">
         <div className="rounded-2xl bg-gradient-to-br from-primary to-accent p-10 text-center text-white md:p-16">
-          <h2 className="text-3xl font-bold md:text-4xl">Prêt à rejoindre la MUGEC-CI ?</h2>
+          <h2 className="text-3xl font-bold md:text-4xl">Inscrivez-vous dès maintenant à la MUGEC-CI</h2>
           <p className="mx-auto mt-3 max-w-2xl text-white/90">
-            Frais d'adhésion uniques de 5 000 FCFA payables par mobile money. Inscription en moins
-            de 5 minutes.
+            Frais d'inscription uniques de 5 000 FCFA, payables par mobile money. Inscription en
+            moins de 5 minutes, sans déplacement.
           </p>
           <Button asChild size="lg" variant="secondary" className="mt-6">
-            <Link to="/inscription">Commencer mon adhésion</Link>
+            <Link to="/inscription">M'inscrire en ligne</Link>
           </Button>
         </div>
       </section>
