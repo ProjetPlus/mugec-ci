@@ -16,9 +16,9 @@ export function SiteHeader() {
   const { user, signOut } = useAuth();
   return (
     <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur">
-      <div className="container mx-auto flex h-20 max-w-7xl items-center justify-between gap-4 px-4">
+      <div className="container mx-auto flex h-28 max-w-7xl items-center justify-between gap-4 px-4">
         <Link to="/" className="flex items-center gap-3">
-          <img src={logo} alt="MUGEC-CI" className="h-12 w-auto" />
+          <img src={logo} alt="MUGEC-CI" className="h-20 w-auto md:h-24" />
         </Link>
         <nav className="hidden items-center gap-1 md:flex">
           {nav.map((n) => (
