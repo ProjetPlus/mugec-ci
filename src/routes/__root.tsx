@@ -7,8 +7,11 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
+import { Toaster } from "@/components/ui/sonner";
+import { AuthProvider } from "@/lib/auth";
 
 import appCss from "../styles.css?url";
+
 
 function NotFoundComponent() {
   return (
@@ -72,21 +75,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
-    ],
-    links: [
+      { title: "MUGEC-CI — Mutuelle Générale du Personnel des Collectivités Territoriales" },
       {
-        rel: "stylesheet",
-        href: appCss,
+        name: "description",
+        content:
+          "Plateforme officielle de la MUGEC-CI : adhésion en ligne, espace membre, cotisations et services aux agents des collectivités territoriales de Côte d'Ivoire.",
       },
+      { name: "author", content: "MUGEC-CI" },
+      { property: "og:title", content: "MUGEC-CI — Plateforme officielle" },
+      {
+        property: "og:description",
+        content: "Adhérez à la MUGEC-CI en ligne et accédez à votre espace membre sécurisé.",
+      },
+      { property: "og:type", content: "website" },
     ],
+    links: [{ rel: "stylesheet", href: appCss }],
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -96,7 +99,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="fr">
       <head>
         <HeadContent />
       </head>
@@ -113,7 +116,11 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <AuthProvider>
+        <Outlet />
+        <Toaster richColors position="top-right" />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
+
