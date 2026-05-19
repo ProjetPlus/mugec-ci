@@ -48,7 +48,7 @@ export function SiteHeader() {
                 <Link to="/login">Connexion</Link>
               </Button>
               <Button asChild size="sm">
-                <Link to="/inscription">Adhérer</Link>
+                <Link to="/inscription">S'inscrire</Link>
               </Button>
             </>
           )}
