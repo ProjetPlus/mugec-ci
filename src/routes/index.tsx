@@ -18,12 +18,12 @@ const stats = [
 ];
 
 const features = [
-  { icon: Users, title: "Adhésion 100% en ligne", desc: "Formulaire en 3 étapes, paiement mobile et validation automatique." },
-  { icon: Wallet, title: "Cotisations simplifiées", desc: "Orange Money, MTN MoMo, Wave et Moov en temps réel." },
-  { icon: FileBadge, title: "Fiche & carte de membre", desc: "Documents officiels téléchargeables au format PDF." },
-  { icon: ShieldCheck, title: "Espace sécurisé", desc: "Vos données personnelles et documents protégés." },
-  { icon: Bell, title: "Notifications", desc: "Rappels par SMS, WhatsApp et e-mail." },
-  { icon: Smartphone, title: "Accessible partout", desc: "Plateforme responsive, consultable hors-ligne." },
+  { icon: Users, title: "Inscription 100% en ligne", desc: "Inscrivez-vous en 3 étapes, payez par mobile money et recevez votre validation automatiquement." },
+  { icon: Wallet, title: "Vos cotisations simplifiées", desc: "Réglez vos cotisations via Orange Money, MTN MoMo, Wave ou Moov, en temps réel." },
+  { icon: FileBadge, title: "Votre fiche & carte de membre", desc: "Téléchargez vos documents officiels au format PDF, signés par la MUGEC-CI." },
+  { icon: ShieldCheck, title: "Un espace sécurisé", desc: "Vos données personnelles et vos documents sont protégés et chiffrés." },
+  { icon: Bell, title: "Restez informé(e)", desc: "Recevez vos rappels et notifications par SMS, WhatsApp et e-mail." },
+  { icon: Smartphone, title: "Accessible partout", desc: "Une plateforme responsive, consultable depuis votre téléphone, où que vous soyez." },
 ];
 
 function Index() {
