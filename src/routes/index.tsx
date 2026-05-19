@@ -51,13 +51,14 @@ function Index() {
               <span className="text-accent">numérique</span>.
             </h1>
             <p className="mt-6 max-w-xl text-lg text-muted-foreground">
-              Adhérez en ligne, gérez vos cotisations, téléchargez votre carte de membre et restez
-              connecté à votre mutuelle, où que vous soyez.
+              Bienvenue sur votre plateforme officielle. Inscrivez-vous en ligne, réglez vos
+              cotisations, téléchargez votre carte de membre et restez connecté(e) à votre
+              mutuelle, où que vous soyez.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg">
                 <Link to="/inscription">
-                  Adhérer maintenant <ArrowRight className="ml-2 h-4 w-4" />
+                  M'inscrire en ligne <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg">
