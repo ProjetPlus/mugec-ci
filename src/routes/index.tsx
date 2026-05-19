@@ -114,13 +114,13 @@ function Index() {
       {/* CTA */}
       <section className="container mx-auto max-w-7xl px-4 pb-20">
         <div className="rounded-2xl bg-gradient-to-br from-primary to-accent p-10 text-center text-white md:p-16">
-          <h2 className="text-3xl font-bold md:text-4xl">Prêt à rejoindre la MUGEC-CI ?</h2>
+          <h2 className="text-3xl font-bold md:text-4xl">Inscrivez-vous dès maintenant à la MUGEC-CI</h2>
           <p className="mx-auto mt-3 max-w-2xl text-white/90">
-            Frais d'adhésion uniques de 5 000 FCFA payables par mobile money. Inscription en moins
-            de 5 minutes.
+            Frais d'inscription uniques de 5 000 FCFA, payables par mobile money. Inscription en
+            moins de 5 minutes, sans déplacement.
           </p>
           <Button asChild size="lg" variant="secondary" className="mt-6">
-            <Link to="/inscription">Commencer mon adhésion</Link>
+            <Link to="/inscription">M'inscrire en ligne</Link>
           </Button>
         </div>
       </section>
