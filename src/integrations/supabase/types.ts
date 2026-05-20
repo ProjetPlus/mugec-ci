@@ -91,26 +91,82 @@ export type Database = {
           },
         ]
       }
+      dependants: {
+        Row: {
+          created_at: string
+          date_naissance: string | null
+          id: string
+          member_id: string
+          nom: string
+          prenoms: string | null
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          date_naissance?: string | null
+          id?: string
+          member_id: string
+          nom: string
+          prenoms?: string | null
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          date_naissance?: string | null
+          id?: string
+          member_id?: string
+          nom?: string
+          prenoms?: string | null
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dependants_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       documents: {
         Row: {
           created_at: string
+          file_name: string | null
           id: string
           member_id: string
+          mime_type: string | null
+          offline_available: boolean
+          title: string | null
           type: string
+          uploaded_by: string | null
           url: string
         }
         Insert: {
           created_at?: string
+          file_name?: string | null
           id?: string
           member_id: string
+          mime_type?: string | null
+          offline_available?: boolean
+          title?: string | null
           type: string
+          uploaded_by?: string | null
           url: string
         }
         Update: {
           created_at?: string
+          file_name?: string | null
           id?: string
           member_id?: string
+          mime_type?: string | null
+          offline_available?: boolean
+          title?: string | null
           type?: string
+          uploaded_by?: string | null
           url?: string
         }
         Relationships: [
@@ -190,24 +246,33 @@ export type Database = {
           collectivite: string | null
           created_at: string
           date_embauche: string | null
+          date_inscription: string | null
           date_naissance: string | null
+          direction: string | null
           email: string | null
           fonction: string | null
           frais_paye: boolean
           id: string
+          is_legacy: boolean
           lieu_naissance: string | null
           matricule: string | null
           matricule_pro: string | null
           nom: string
           paiement_methode: string | null
+          payment_confirmed_at: string | null
+          payment_reference: string | null
+          photo_required: boolean
           photo_url: string | null
           prenoms: string
+          qr_code: string | null
           region: string | null
           sexe: string | null
+          source: string
           statut: string
           telephone: string | null
           updated_at: string
-          user_id: string | null
+          user_id: string
+          validation_mode: string
         }
         Insert: {
           adresse?: string | null
@@ -216,24 +281,33 @@ export type Database = {
           collectivite?: string | null
           created_at?: string
           date_embauche?: string | null
+          date_inscription?: string | null
           date_naissance?: string | null
+          direction?: string | null
           email?: string | null
           fonction?: string | null
           frais_paye?: boolean
           id?: string
+          is_legacy?: boolean
           lieu_naissance?: string | null
           matricule?: string | null
           matricule_pro?: string | null
           nom: string
           paiement_methode?: string | null
+          payment_confirmed_at?: string | null
+          payment_reference?: string | null
+          photo_required?: boolean
           photo_url?: string | null
           prenoms: string
+          qr_code?: string | null
           region?: string | null
           sexe?: string | null
+          source?: string
           statut?: string
           telephone?: string | null
           updated_at?: string
-          user_id?: string | null
+          user_id: string
+          validation_mode?: string
         }
         Update: {
           adresse?: string | null
@@ -242,24 +316,33 @@ export type Database = {
           collectivite?: string | null
           created_at?: string
           date_embauche?: string | null
+          date_inscription?: string | null
           date_naissance?: string | null
+          direction?: string | null
           email?: string | null
           fonction?: string | null
           frais_paye?: boolean
           id?: string
+          is_legacy?: boolean
           lieu_naissance?: string | null
           matricule?: string | null
           matricule_pro?: string | null
           nom?: string
           paiement_methode?: string | null
+          payment_confirmed_at?: string | null
+          payment_reference?: string | null
+          photo_required?: boolean
           photo_url?: string | null
           prenoms?: string
+          qr_code?: string | null
           region?: string | null
           sexe?: string | null
+          source?: string
           statut?: string
           telephone?: string | null
           updated_at?: string
-          user_id?: string | null
+          user_id?: string
+          validation_mode?: string
         }
         Relationships: []
       }
@@ -296,6 +379,39 @@ export type Database = {
         }
         Relationships: []
       }
+      notification_templates: {
+        Row: {
+          active: boolean
+          body: string
+          channel: string
+          created_at: string
+          event: string
+          id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          body: string
+          channel: string
+          created_at?: string
+          event: string
+          id?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          body?: string
+          channel?: string
+          created_at?: string
+          event?: string
+          id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           body: string
@@ -325,6 +441,59 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      notifications_log: {
+        Row: {
+          canal: string
+          contenu: string
+          created_at: string
+          error_message: string | null
+          event: string
+          id: string
+          member_id: string | null
+          provider: string | null
+          provider_reference: string | null
+          sent_at: string | null
+          statut: string
+          user_id: string | null
+        }
+        Insert: {
+          canal: string
+          contenu: string
+          created_at?: string
+          error_message?: string | null
+          event: string
+          id?: string
+          member_id?: string | null
+          provider?: string | null
+          provider_reference?: string | null
+          sent_at?: string | null
+          statut?: string
+          user_id?: string | null
+        }
+        Update: {
+          canal?: string
+          contenu?: string
+          created_at?: string
+          error_message?: string | null
+          event?: string
+          id?: string
+          member_id?: string | null
+          provider?: string | null
+          provider_reference?: string | null
+          sent_at?: string | null
+          statut?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_log_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       opportunites: {
         Row: {
@@ -361,6 +530,100 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          created_at: string
+          id: string
+          member_id: string
+          montant_total: number
+          operateur: string | null
+          paid_at: string | null
+          part_miprojet: number
+          part_mutuelle: number
+          periode: string | null
+          reference_transaction: string | null
+          statut_paiement: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          member_id: string
+          montant_total: number
+          operateur?: string | null
+          paid_at?: string | null
+          part_miprojet?: number
+          part_mutuelle?: number
+          periode?: string | null
+          reference_transaction?: string | null
+          statut_paiement?: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          member_id?: string
+          montant_total?: number
+          operateur?: string | null
+          paid_at?: string | null
+          part_miprojet?: number
+          part_mutuelle?: number
+          periode?: string | null
+          reference_transaction?: string | null
+          statut_paiement?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transactions_miprojet: {
+        Row: {
+          created_at: string
+          date_virement: string | null
+          id: string
+          montant: number
+          reference: string | null
+          statut: string
+          subscription_id: string
+        }
+        Insert: {
+          created_at?: string
+          date_virement?: string | null
+          id?: string
+          montant: number
+          reference?: string | null
+          statut?: string
+          subscription_id: string
+        }
+        Update: {
+          created_at?: string
+          date_virement?: string | null
+          id?: string
+          montant?: number
+          reference?: string | null
+          statut?: string
+          subscription_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_miprojet_subscription_id_fkey"
+            columns: ["subscription_id"]
+            isOneToOne: false
+            referencedRelation: "subscriptions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -402,6 +665,7 @@ export type Database = {
         Returns: boolean
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_super_admin: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       app_role:
@@ -411,6 +675,13 @@ export type Database = {
         | "admin_local"
         | "agent_saisie"
         | "membre"
+        | "president"
+        | "secretaire_general"
+        | "tresorier_national"
+        | "commissaire_comptes"
+        | "secretaire_regional"
+        | "tresorier_regional"
+        | "member"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -545,6 +816,13 @@ export const Constants = {
         "admin_local",
         "agent_saisie",
         "membre",
+        "president",
+        "secretaire_general",
+        "tresorier_national",
+        "commissaire_comptes",
+        "secretaire_regional",
+        "tresorier_regional",
+        "member",
       ],
     },
   },
