@@ -77,17 +77,18 @@ function Page() {
           </Badge>
         </div>
 
-        <div className="mt-10 grid gap-6 md:grid-cols-3">
-          <ActionCard icon={FileText} title="Fiche d'adhésion" desc="Téléchargez votre fiche officielle PDF.">
-            <Button asChild variant="outline" className="w-full">
-              <Link to="/membre/carte"><Download className="mr-2 h-4 w-4" /> Voir & télécharger</Link>
-            </Button>
+        <div className="mt-10 grid gap-6 md:grid-cols-4">
+          <ActionCard icon={FileText} title="Profil" desc="Mettre à jour mes informations.">
+            <Button asChild variant="outline" className="w-full"><Link to="/membre/profil">Ouvrir</Link></Button>
           </ActionCard>
-          <ActionCard icon={Wallet} title="Cotisations" desc="Aucune cotisation en attente.">
-            <Button variant="outline" className="w-full" disabled>Payer (bientôt)</Button>
+          <ActionCard icon={FileText} title="Documents" desc="Fiche & carte téléchargeables.">
+            <Button asChild variant="outline" className="w-full"><Link to="/membre/documents"><Download className="mr-2 h-4 w-4" /> Ouvrir</Link></Button>
           </ActionCard>
-          <ActionCard icon={Bell} title="Notifications" desc="Pas de nouvelle notification.">
-            <Button variant="ghost" className="w-full">Voir l'historique</Button>
+          <ActionCard icon={Wallet} title="Cotisations" desc="Historique et statut.">
+            <Button asChild variant="outline" className="w-full"><Link to="/membre/cotisations">Voir</Link></Button>
+          </ActionCard>
+          <ActionCard icon={Bell} title="Carte de membre" desc="QR Code et filigrane.">
+            <Button asChild variant="outline" className="w-full"><Link to="/membre/carte">Ouvrir</Link></Button>
           </ActionCard>
         </div>
 

@@ -35,21 +35,13 @@ export function SiteHeader() {
         <div className="flex items-center gap-2">
           {user ? (
             <>
-              <Button asChild variant="outline" size="sm">
-                <Link to="/membre">Mon espace</Link>
-              </Button>
-              <Button size="sm" variant="ghost" onClick={() => signOut()}>
-                Déconnexion
-              </Button>
+              <Button asChild variant="outline" size="sm"><Link to="/membre">Mon espace</Link></Button>
+              <Button size="sm" variant="ghost" onClick={() => signOut()}>Déconnexion</Button>
             </>
           ) : (
             <>
-              <Button asChild variant="ghost" size="sm">
-                <Link to="/login">Connexion</Link>
-              </Button>
-              <Button asChild size="sm">
-                <Link to="/inscription">S'inscrire</Link>
-              </Button>
+              <Button asChild variant="ghost" size="sm"><Link to="/login">Connexion</Link></Button>
+              <Button asChild size="sm"><Link to="/inscription">S'inscrire</Link></Button>
             </>
           )}
         </div>
