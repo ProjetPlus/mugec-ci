@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as OpportunitesRouteImport } from './routes/opportunites'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as InscriptionRouteImport } from './routes/inscription'
@@ -18,8 +19,16 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ActualitesRouteImport } from './routes/actualites'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MembreIndexRouteImport } from './routes/membre/index'
+import { Route as MembreProfilRouteImport } from './routes/membre/profil'
+import { Route as MembreDocumentsRouteImport } from './routes/membre/documents'
+import { Route as MembreCotisationsRouteImport } from './routes/membre/cotisations'
 import { Route as MembreCarteRouteImport } from './routes/membre/carte'
 
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OpportunitesRoute = OpportunitesRouteImport.update({
   id: '/opportunites',
   path: '/opportunites',
@@ -65,6 +74,21 @@ const MembreIndexRoute = MembreIndexRouteImport.update({
   path: '/membre/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MembreProfilRoute = MembreProfilRouteImport.update({
+  id: '/membre/profil',
+  path: '/membre/profil',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MembreDocumentsRoute = MembreDocumentsRouteImport.update({
+  id: '/membre/documents',
+  path: '/membre/documents',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MembreCotisationsRoute = MembreCotisationsRouteImport.update({
+  id: '/membre/cotisations',
+  path: '/membre/cotisations',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MembreCarteRoute = MembreCarteRouteImport.update({
   id: '/membre/carte',
   path: '/membre/carte',
@@ -80,7 +104,11 @@ export interface FileRoutesByFullPath {
   '/inscription': typeof InscriptionRoute
   '/login': typeof LoginRoute
   '/opportunites': typeof OpportunitesRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/membre/carte': typeof MembreCarteRoute
+  '/membre/cotisations': typeof MembreCotisationsRoute
+  '/membre/documents': typeof MembreDocumentsRoute
+  '/membre/profil': typeof MembreProfilRoute
   '/membre/': typeof MembreIndexRoute
 }
 export interface FileRoutesByTo {
@@ -92,7 +120,11 @@ export interface FileRoutesByTo {
   '/inscription': typeof InscriptionRoute
   '/login': typeof LoginRoute
   '/opportunites': typeof OpportunitesRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/membre/carte': typeof MembreCarteRoute
+  '/membre/cotisations': typeof MembreCotisationsRoute
+  '/membre/documents': typeof MembreDocumentsRoute
+  '/membre/profil': typeof MembreProfilRoute
   '/membre': typeof MembreIndexRoute
 }
 export interface FileRoutesById {
@@ -105,7 +137,11 @@ export interface FileRoutesById {
   '/inscription': typeof InscriptionRoute
   '/login': typeof LoginRoute
   '/opportunites': typeof OpportunitesRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/membre/carte': typeof MembreCarteRoute
+  '/membre/cotisations': typeof MembreCotisationsRoute
+  '/membre/documents': typeof MembreDocumentsRoute
+  '/membre/profil': typeof MembreProfilRoute
   '/membre/': typeof MembreIndexRoute
 }
 export interface FileRouteTypes {
@@ -119,7 +155,11 @@ export interface FileRouteTypes {
     | '/inscription'
     | '/login'
     | '/opportunites'
+    | '/reset-password'
     | '/membre/carte'
+    | '/membre/cotisations'
+    | '/membre/documents'
+    | '/membre/profil'
     | '/membre/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -131,7 +171,11 @@ export interface FileRouteTypes {
     | '/inscription'
     | '/login'
     | '/opportunites'
+    | '/reset-password'
     | '/membre/carte'
+    | '/membre/cotisations'
+    | '/membre/documents'
+    | '/membre/profil'
     | '/membre'
   id:
     | '__root__'
@@ -143,7 +187,11 @@ export interface FileRouteTypes {
     | '/inscription'
     | '/login'
     | '/opportunites'
+    | '/reset-password'
     | '/membre/carte'
+    | '/membre/cotisations'
+    | '/membre/documents'
+    | '/membre/profil'
     | '/membre/'
   fileRoutesById: FileRoutesById
 }
@@ -156,12 +204,23 @@ export interface RootRouteChildren {
   InscriptionRoute: typeof InscriptionRoute
   LoginRoute: typeof LoginRoute
   OpportunitesRoute: typeof OpportunitesRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   MembreCarteRoute: typeof MembreCarteRoute
+  MembreCotisationsRoute: typeof MembreCotisationsRoute
+  MembreDocumentsRoute: typeof MembreDocumentsRoute
+  MembreProfilRoute: typeof MembreProfilRoute
   MembreIndexRoute: typeof MembreIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/opportunites': {
       id: '/opportunites'
       path: '/opportunites'
@@ -225,6 +284,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MembreIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/membre/profil': {
+      id: '/membre/profil'
+      path: '/membre/profil'
+      fullPath: '/membre/profil'
+      preLoaderRoute: typeof MembreProfilRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/membre/documents': {
+      id: '/membre/documents'
+      path: '/membre/documents'
+      fullPath: '/membre/documents'
+      preLoaderRoute: typeof MembreDocumentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/membre/cotisations': {
+      id: '/membre/cotisations'
+      path: '/membre/cotisations'
+      fullPath: '/membre/cotisations'
+      preLoaderRoute: typeof MembreCotisationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/membre/carte': {
       id: '/membre/carte'
       path: '/membre/carte'
@@ -244,7 +324,11 @@ const rootRouteChildren: RootRouteChildren = {
   InscriptionRoute: InscriptionRoute,
   LoginRoute: LoginRoute,
   OpportunitesRoute: OpportunitesRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   MembreCarteRoute: MembreCarteRoute,
+  MembreCotisationsRoute: MembreCotisationsRoute,
+  MembreDocumentsRoute: MembreDocumentsRoute,
+  MembreProfilRoute: MembreProfilRoute,
   MembreIndexRoute: MembreIndexRoute,
 }
 export const routeTree = rootRouteImport

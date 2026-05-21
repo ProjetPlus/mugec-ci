@@ -1,10 +1,7 @@
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
+// Single source of truth — re-export the generated integration client.
+// The env var is VITE_SUPABASE_PUBLISHABLE_KEY (NOT VITE_SUPABASE_ANON_KEY).
+export { supabase } from "@/integrations/supabase/client";
 
-const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
-const anon = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
-
-export const isSupabaseConfigured = Boolean(url && anon);
-
-export const supabase: SupabaseClient = isSupabaseConfigured
-  ? createClient(url!, anon!, { auth: { persistSession: true, autoRefreshToken: true } })
-  : (createClient("https://placeholder.supabase.co", "placeholder") as SupabaseClient);
+export const isSupabaseConfigured = Boolean(
+  import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+);
