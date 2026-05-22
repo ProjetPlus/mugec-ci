@@ -15,7 +15,7 @@ import { z } from "zod";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { finalizeRegistration } from "@/lib/inscription.functions";
-import { Check, CreditCard, User, ArrowLeft, ArrowRight, Download, FileText, Upload, BadgeCheck } from "lucide-react";
+import { Check, CreditCard, User, ArrowLeft, ArrowRight, Download, FileText, BadgeCheck } from "lucide-react";
 import { generateFicheAdhesionPDF, generateAutorisationPrelevementPDF, downloadBlob, type DraftData } from "@/lib/pdf-documents";
 
 export const Route = createFileRoute("/inscription")({ component: Page });
@@ -387,6 +387,15 @@ function FileF({ label, v, on }: { label: string; v: string; on: (v: string) => 
         onChange={(e) => on(e.target.files?.[0]?.name ?? "")}
       />
       {v ? <p className="mt-1 text-xs text-muted-foreground">Fichier sélectionné : {v}</p> : null}
+    </div>
+  );
+}
+
+function Summary({ k, v }: { k: string; v: string }) {
+  return (
+    <div className="rounded-md border bg-background/80 p-3">
+      <dt className="text-xs text-muted-foreground">{k}</dt>
+      <dd className="mt-1 font-medium text-foreground">{v || "—"}</dd>
     </div>
   );
 }
