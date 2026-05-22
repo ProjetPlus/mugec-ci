@@ -190,7 +190,7 @@ function Page() {
       <SiteHeader />
       <section className="container mx-auto max-w-4xl px-4 py-10">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-2xl font-bold">Fiche officielle de membre</h1>
+          <h1 className="text-2xl font-bold">Carte et fiche membre</h1>
           <div className="flex gap-2">
             <Button variant="outline" onClick={() => window.print()}>
               <Printer className="mr-2 h-4 w-4" /> Imprimer
@@ -214,7 +214,7 @@ function Page() {
                   <div className="text-right text-xs">
                     <div className="font-semibold">RÉPUBLIQUE DE CÔTE D'IVOIRE</div>
                     <div>Union – Discipline – Travail</div>
-                    <div className="mt-2 font-bold text-primary">FICHE D'ADHÉSION N° {m.matricule ?? "—"}</div>
+                    <div className="mt-2 font-bold text-primary">FICHE MEMBRE N° {m.matricule ?? "—"}</div>
                   </div>
                 </div>
 

@@ -40,7 +40,7 @@ function Page() {
           <Card><CardContent className="p-6">
             <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary"><FileText className="h-5 w-5" /></div>
             <h2 className="font-semibold">Fiche officielle</h2>
-            <p className="mt-1 text-sm text-muted-foreground">Téléchargez votre fiche d’adhésion avec QR Code et filigrane.</p>
+            <p className="mt-1 text-sm text-muted-foreground">Téléchargez votre fiche d’inscription avec QR Code et filigrane.</p>
             <Button asChild className="mt-4 w-full" variant="outline"><Link to="/membre/carte"><Download className="mr-2 h-4 w-4" /> Ouvrir</Link></Button>
           </CardContent></Card>
           <Card><CardContent className="p-6">

@@ -110,7 +110,7 @@ function Page() {
     setGeneratingPdf("fiche");
     try {
       const blob = await generateFicheAdhesionPDF(data as DraftData);
-      downloadBlob(blob, `fiche-adhesion-${data.nom ?? "mugec"}.pdf`);
+      downloadBlob(blob, `fiche-inscription-${data.nom ?? "mugec"}.pdf`);
     } finally { setGeneratingPdf(null); }
   }
   async function downloadAutorisation() {
@@ -277,7 +277,7 @@ function Page() {
                   <div className="mt-3 flex flex-wrap gap-2">
                     <Button type="button" size="sm" variant="outline" onClick={downloadFiche} disabled={generatingPdf !== null}>
                       <Download className="mr-2 h-4 w-4" />
-                      {generatingPdf === "fiche" ? "Génération…" : "Fiche d'adhésion (pré-remplie)"}
+                      {generatingPdf === "fiche" ? "Génération…" : "Fiche d’inscription (pré-remplie)"}
                     </Button>
                     <Button type="button" size="sm" variant="outline" onClick={downloadAutorisation} disabled={generatingPdf !== null}>
                       <Download className="mr-2 h-4 w-4" />

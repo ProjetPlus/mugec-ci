@@ -14,7 +14,7 @@ export function SiteFooter() {
           <h4 className="mb-3 text-sm font-semibold text-foreground">Documents</h4>
           <ul className="space-y-1 text-sm text-muted-foreground">
             <li><a href="/documents/reglement-interieur-mugec-ci.pdf" target="_blank" rel="noreferrer" className="hover:text-primary">Règlement intérieur</a></li>
-            <li><a href="/documents/fiche-adhesion-vierge.pdf" target="_blank" rel="noreferrer" className="hover:text-primary">Fiche d'adhésion (vierge)</a></li>
+            <li><a href="/documents/fiche-adhesion-vierge.pdf" target="_blank" rel="noreferrer" className="hover:text-primary">Fiche d’inscription (vierge)</a></li>
             <li><a href="/documents/autorisation-prelevement-vierge.pdf" target="_blank" rel="noreferrer" className="hover:text-primary">Autorisation de prélèvement</a></li>
             <li><a href="/inscription" className="hover:text-primary">S'inscrire en ligne</a></li>
           </ul>
