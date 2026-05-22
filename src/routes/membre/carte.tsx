@@ -12,7 +12,6 @@ import watermarkUrl from "@/assets/mugec-watermark.png";
 import { Download, Printer, Loader2 } from "lucide-react";
 import QRCode from "qrcode";
 import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
 
 export const Route = createFileRoute("/membre/carte")({
   component: Page,
@@ -48,6 +47,79 @@ async function imageToDataUrl(src: string) {
     fr.readAsDataURL(blob);
   });
   return imageCache[src];
+}
+
+function addPdfWatermark(pdf: jsPDF, watermarkData: string) {
+  const anyPdf = pdf as unknown as { GState: new (o: { opacity: number }) => unknown; setGState: (g: unknown) => void };
+  anyPdf.setGState(new anyPdf.GState({ opacity: 0.07 }));
+  pdf.addImage(watermarkData, "PNG", 20, 7, 45, 40, undefined, "FAST");
+  anyPdf.setGState(new anyPdf.GState({ opacity: 1 }));
+}
+
+function writeLabelValue(pdf: jsPDF, label: string, value: string | undefined, x: number, y: number, maxWidth: number) {
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(5.4);
+  pdf.setTextColor(30, 91, 168);
+  pdf.text(label.toUpperCase(), x, y);
+  pdf.setFont("courier", "normal");
+  pdf.setFontSize((value?.length ?? 0) > 26 ? 6.2 : 7);
+  pdf.setTextColor(26, 58, 143);
+  pdf.text(value?.trim() || "—", x, y + 3.5, { maxWidth });
+}
+
+function drawCardFront(pdf: jsPDF, m: Member, qr: string, logoData: string, watermarkData: string) {
+  addPdfWatermark(pdf, watermarkData);
+  pdf.setDrawColor(30, 91, 168);
+  pdf.setLineWidth(0.7);
+  pdf.rect(1.5, 1.5, 82.6, 51, "S");
+  pdf.addImage(logoData, "PNG", 4, 3.5, 15, 12, undefined, "FAST");
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(7.5);
+  pdf.setTextColor(30, 91, 168);
+  pdf.text("CARTE DE MEMBRE MUGEC-CI", 42.8, 7.5, { align: "center" });
+  pdf.setFontSize(4.8);
+  pdf.setTextColor(40, 40, 40);
+  pdf.text("Mutuelle Générale du Personnel des Collectivités Territoriales", 42.8, 11.2, { align: "center" });
+  pdf.setDrawColor(210, 210, 210);
+  pdf.roundedRect(5, 17, 17, 22, 1, 1, "S");
+  pdf.setFontSize(5);
+  pdf.setTextColor(120, 120, 120);
+  pdf.text("PHOTO", 13.5, 28.5, { align: "center" });
+  writeLabelValue(pdf, "Nom & prénoms", `${m.nom ?? ""} ${m.prenoms ?? ""}`.trim(), 25, 18, 38);
+  writeLabelValue(pdf, "Matricule", m.matricule, 25, 26, 30);
+  writeLabelValue(pdf, "Type", m.type_membre ?? "office", 58, 26, 18);
+  writeLabelValue(pdf, "Collectivité", m.collectivite, 25, 34, 34);
+  writeLabelValue(pdf, "Statut", m.statut ?? "actif", 58, 34, 18);
+  writeLabelValue(pdf, "Date d'inscription", m.date_inscription ? new Date(m.date_inscription).toLocaleDateString("fr-FR") : "—", 25, 42, 30);
+  if (qr) pdf.addImage(qr, "PNG", 64, 31, 17, 17, undefined, "FAST");
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(3.8);
+  pdf.setTextColor(70, 70, 70);
+  pdf.text("QR code vérifiable — marge haute correction pour impression", 64, 50);
+}
+
+function drawCardBack(pdf: jsPDF, m: Member, watermarkData: string) {
+  addPdfWatermark(pdf, watermarkData);
+  pdf.setDrawColor(30, 91, 168);
+  pdf.setLineWidth(0.7);
+  pdf.rect(1.5, 1.5, 82.6, 51, "S");
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(8);
+  pdf.setTextColor(30, 91, 168);
+  pdf.text("MUGEC-CI", 42.8, 10, { align: "center" });
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(5.8);
+  pdf.setTextColor(40, 40, 40);
+  pdf.text("Cette carte est strictement personnelle et demeure la propriété de la MUGEC-CI.", 42.8, 19, { align: "center", maxWidth: 70 });
+  pdf.text("En cas de perte, prévenir immédiatement la mutuelle.", 42.8, 27, { align: "center", maxWidth: 70 });
+  pdf.setFont("helvetica", "bold");
+  pdf.text("À retourner à la MUGEC-CI en cas de cessation de qualité de membre.", 42.8, 35, { align: "center", maxWidth: 70 });
+  pdf.setFont("courier", "normal");
+  pdf.setTextColor(26, 58, 143);
+  pdf.text(`Matricule : ${m.matricule ?? "—"}`, 42.8, 43, { align: "center" });
+  pdf.setFont("helvetica", "normal");
+  pdf.setTextColor(30, 91, 168);
+  pdf.text("Tél : 07 58 89 43 63 / 07 08 27 67 51", 42.8, 49, { align: "center" });
 }
 
 function Page() {
