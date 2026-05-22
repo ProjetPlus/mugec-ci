@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,9 +15,12 @@ import { z } from "zod";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { finalizeRegistration } from "@/lib/inscription.functions";
-import { Check, CreditCard, User, Briefcase, ArrowLeft, ArrowRight } from "lucide-react";
+import { Check, CreditCard, User, Briefcase, ArrowLeft, ArrowRight, Download, FileText } from "lucide-react";
+import { generateFicheAdhesionPDF, generateAutorisationPrelevementPDF, downloadBlob, type DraftData } from "@/lib/pdf-documents";
 
 export const Route = createFileRoute("/inscription")({ component: Page });
+const DRAFT_KEY = "mugec_inscription_draft_v1";
+
 
 const step1Schema = z.object({
   nom: z.string().trim().min(2, "Nom requis").max(100),
@@ -61,9 +64,51 @@ function Page() {
   const [step, setStep] = useState(1);
   const [data, setData] = useState<Partial<FormData>>({ sexe: "M", paiement: "orange" });
   const [submitting, setSubmitting] = useState(false);
+  const [generatingPdf, setGeneratingPdf] = useState<"fiche" | "autorisation" | null>(null);
+
+  // Reprise du brouillon depuis localStorage
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(DRAFT_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        setData((d) => ({ ...d, ...parsed }));
+      }
+    } catch { /* ignore */ }
+  }, []);
+
+  // Persistance automatique locale + serveur
+  useEffect(() => {
+    const t = setTimeout(() => {
+      try { localStorage.setItem(DRAFT_KEY, JSON.stringify(data)); } catch { /* ignore */ }
+      if (isSupabaseConfigured && data.email && data.email.includes("@")) {
+        supabase.from("registration_drafts").upsert(
+          { email: data.email.toLowerCase(), telephone: data.telephone ?? null, nom: data.nom ?? null, prenoms: data.prenoms ?? null, step, data },
+          { onConflict: "email" },
+        ).then(() => { /* noop */ });
+      }
+    }, 800);
+    return () => clearTimeout(t);
+  }, [data, step]);
 
   const upd = (k: keyof FormData, v: string) => setData((d) => ({ ...d, [k]: v }));
   const val = (k: keyof FormData) => (data[k] ?? "") as string;
+
+  async function downloadFiche() {
+    setGeneratingPdf("fiche");
+    try {
+      const blob = await generateFicheAdhesionPDF(data as DraftData);
+      downloadBlob(blob, `fiche-adhesion-${data.nom ?? "mugec"}.pdf`);
+    } finally { setGeneratingPdf(null); }
+  }
+  async function downloadAutorisation() {
+    setGeneratingPdf("autorisation");
+    try {
+      const blob = await generateAutorisationPrelevementPDF(data as DraftData);
+      downloadBlob(blob, `autorisation-prelevement-${data.nom ?? "mugec"}.pdf`);
+    } finally { setGeneratingPdf(null); }
+  }
+
 
   function validateStep(): boolean {
     try {
