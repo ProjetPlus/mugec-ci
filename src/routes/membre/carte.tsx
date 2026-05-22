@@ -87,20 +87,25 @@ function Page() {
 
   useEffect(() => {
     const id = m.matricule ?? user?.id ?? "demo";
-    QRCode.toDataURL(`https://mugec-ci.org/m/${id}`, { width: 200, margin: 0 }).then(setQr);
+    const verifyUrl = m.qr_code ?? `https://mugec-ci.ivoireprojet.com/verifier/${encodeURIComponent(id)}`;
+    QRCode.toDataURL(verifyUrl, {
+      width: 420,
+      margin: 4,
+      errorCorrectionLevel: "H",
+      color: { dark: "#000000", light: "#ffffff" },
+    }).then(setQr);
   }, [m, user]);
 
   async function downloadPDF() {
-    if (!ref.current) return;
     setBusy(true);
     try {
-      const canvas = await html2canvas(ref.current, { scale: 2, backgroundColor: "#ffffff", useCORS: true });
-      const img = canvas.toDataURL("image/png");
-      const pdf = new jsPDF({ unit: "mm", format: "a4", orientation: "portrait" });
-      const w = pdf.internal.pageSize.getWidth();
-      const h = (canvas.height * w) / canvas.width;
-      pdf.addImage(img, "PNG", 0, 0, w, h);
-      pdf.save(`fiche-membre-${m.matricule ?? "mugec"}.pdf`);
+      const logoData = await imageToDataUrl(logo);
+      const watermarkData = await imageToDataUrl(watermarkUrl);
+      const pdf = new jsPDF({ unit: "mm", format: [85.6, 54], orientation: "landscape" });
+      drawCardFront(pdf, m, qr, logoData, watermarkData);
+      pdf.addPage([85.6, 54], "landscape");
+      drawCardBack(pdf, m, watermarkData);
+      pdf.save(`carte-membre-recto-verso-${m.matricule ?? "mugec"}.pdf`);
     } finally {
       setBusy(false);
     }
