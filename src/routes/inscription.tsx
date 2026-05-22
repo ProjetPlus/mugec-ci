@@ -15,7 +15,7 @@ import { z } from "zod";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { finalizeRegistration } from "@/lib/inscription.functions";
-import { Check, CreditCard, User, Briefcase, ArrowLeft, ArrowRight, Download, FileText, Upload, BadgeCheck } from "lucide-react";
+import { Check, CreditCard, User, ArrowLeft, ArrowRight, Download, FileText, Upload, BadgeCheck } from "lucide-react";
 import { generateFicheAdhesionPDF, generateAutorisationPrelevementPDF, downloadBlob, type DraftData } from "@/lib/pdf-documents";
 
 export const Route = createFileRoute("/inscription")({ component: Page });
@@ -25,32 +25,34 @@ const DRAFT_KEY = "mugec_inscription_draft_v1";
 const step1Schema = z.object({
   nom: z.string().trim().min(2, "Nom requis").max(100),
   prenoms: z.string().trim().min(2, "Prénoms requis").max(150),
-  dateNaissance: z.string().min(1, "Date de naissance requise"),
+  dateNaissance: z.string().min(1, "Date de naissance requise").refine((v) => {
+    const d = new Date(v);
+    return !Number.isNaN(d.getTime()) && d <= new Date(new Date().setFullYear(new Date().getFullYear() - 18));
+  }, "L'inscription est réservée aux personnes majeures."),
   lieuNaissance: z.string().trim().min(2).max(100),
   sexe: z.enum(["M", "F"]),
   email: z.string().trim().email("Email invalide").max(255),
   telephone: z.string().trim().min(8, "Numéro invalide").max(20),
   cni: z.string().trim().min(4).max(30),
   adresse: z.string().trim().min(2).max(255),
-});
-
-const step2Schema = z.object({
   collectivite: z.string().trim().min(2, "Collectivité requise").max(150),
   region: z.string().trim().min(2).max(100),
   direction: z.string().trim().max(150).optional().or(z.literal("")),
   fonction: z.string().trim().min(2).max(150),
-  matriculePro: z.string().trim().max(50).optional().or(z.literal("")),
+  matriculePro: z.string().trim().min(2, "Matricule Solde requis").max(50),
   dateEmbauche: z.string().optional().or(z.literal("")),
   ayantsDroit: z.string().max(2000).optional().or(z.literal("")),
-  photoIdentite: z.string().optional().or(z.literal("")),
+  photoIdentite: z.string().min(1, "La photo d’identité est obligatoire."),
 });
 
-const step3Schema = z.object({
+const step2Schema = z.object({
   ficheSignee: z.string().min(1, "La fiche signée est obligatoire."),
   autorisationSignee: z.string().min(1, "L’autorisation de prélèvement signée est obligatoire."),
   cniDocument: z.string().min(1, "La copie CNI ou passeport est obligatoire."),
   extraitNaissance: z.string().min(1, "L’extrait de naissance est obligatoire."),
 });
+
+const passwordSchema = z.string().min(8).regex(/[A-Z]/).regex(/[0-9]/).regex(/[^A-Za-z0-9]/);
 
 type FormData = {
   nom: string; prenoms: string; dateNaissance: string; lieuNaissance: string;
@@ -63,7 +65,7 @@ type FormData = {
 
 const steps = [
   { id: 1, label: "Formulaire", icon: User },
-  { id: 2, label: "Documents", icon: FileText },
+  { id: 2, label: "Documents signés", icon: FileText },
   { id: 3, label: "Paiement", icon: CreditCard },
   { id: 4, label: "Confirmation", icon: BadgeCheck },
 ];
