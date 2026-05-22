@@ -126,10 +126,9 @@ function Page() {
     try {
       if (step === 1) step1Schema.parse(data);
       if (step === 2) step2Schema.parse(data);
-      if (step === 3) step3Schema.parse(data);
-      if (step === 4) {
-        if (!data.password || data.password.length < 8) {
-          toast.error("Le mot de passe doit contenir au moins 8 caractères.");
+      if (step === 3) {
+        if (!data.password || !passwordSchema.safeParse(data.password).success) {
+          toast.error("Le mot de passe doit contenir 8 caractères, une majuscule, un chiffre et un caractère spécial.");
           return false;
         }
       }
@@ -245,11 +244,23 @@ function Page() {
                   </Select>
                 </div>
                 <F label="N° CNI" v={val("cni")} on={(v) => upd("cni", v)} />
+                <F label="Matricule Solde" v={val("matriculePro")} on={(v) => upd("matriculePro", v)} />
                 <F label="E-mail" type="email" v={val("email")} on={(v) => upd("email", v)} />
                 <F label="Téléphone (WhatsApp)" v={val("telephone")} on={(v) => upd("telephone", v)} />
+                <FileF label="Photo d’identité (JPG/PNG, max 2 Mo)" v={val("photoIdentite")} on={(v) => upd("photoIdentite", v)} />
+                <F label="Collectivité d'origine" v={val("collectivite")} on={(v) => upd("collectivite", v)} />
+                <F label="Région" v={val("region")} on={(v) => upd("region", v)} />
+                <F label="Direction / Service" v={val("direction")} on={(v) => upd("direction", v)} />
+                <F label="Fonction" v={val("fonction")} on={(v) => upd("fonction", v)} />
+                <F label="Date d'embauche" type="date" v={val("dateEmbauche")} on={(v) => upd("dateEmbauche", v)} />
                 <div className="md:col-span-2">
                   <Label>Adresse</Label>
                   <Textarea value={val("adresse")} onChange={(e) => upd("adresse", e.target.value)} rows={2} />
+                </div>
+                <div className="md:col-span-2">
+                  <Label>Ayants-droit (père, mère, conjoint, enfants — maximum 4 enfants)</Label>
+                  <Textarea value={val("ayantsDroit")} onChange={(e) => upd("ayantsDroit", e.target.value)} rows={3}
+                    placeholder="Ex : Père — Kouadio Koffi. Mère — Aya Koffi. Conjoint — ... Enfants : nom, prénoms, date de naissance." />
                 </div>
               </div>
             )}
@@ -279,29 +290,6 @@ function Page() {
                   </div>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
-                  <F label="Collectivité (mairie, conseil régional…)" v={val("collectivite")} on={(v) => upd("collectivite", v)} />
-                  <F label="Région" v={val("region")} on={(v) => upd("region", v)} />
-                  <F label="Direction / Service" v={val("direction")} on={(v) => upd("direction", v)} />
-                  <F label="Fonction" v={val("fonction")} on={(v) => upd("fonction", v)} />
-                  <F label="Matricule professionnel" v={val("matriculePro")} on={(v) => upd("matriculePro", v)} />
-                  <F label="Date d'embauche" type="date" v={val("dateEmbauche")} on={(v) => upd("dateEmbauche", v)} />
-                  <div className="md:col-span-2">
-                    <Label>Ayants-droit (père, mère, conjoint, enfants…)</Label>
-                    <Textarea value={val("ayantsDroit")} onChange={(e) => upd("ayantsDroit", e.target.value)} rows={3}
-                      placeholder="Ex : Conjoint — Aya Koffi, née le 12/03/1988. Enfants : Marc (2015), Léa (2019)…" />
-                  </div>
-                </div>
-              </div>
-            )}
-
-
-            {step === 3 && (
-              <div className="space-y-6">
-                <div className="rounded-md border border-primary/30 bg-primary/5 p-4">
-                  <h3 className="flex items-center gap-2 font-semibold text-primary"><Upload className="h-4 w-4" /> Pièces signées à téléverser</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">Formats acceptés : PDF, JPG ou PNG. Taille maximale : 5 Mo par fichier.</p>
-                </div>
-                <div className="grid gap-4 md:grid-cols-2">
                   <FileF label="Fiche d’inscription signée" v={val("ficheSignee")} on={(v) => upd("ficheSignee", v)} />
                   <FileF label="Autorisation de prélèvement signée" v={val("autorisationSignee")} on={(v) => upd("autorisationSignee", v)} />
                   <FileF label="Copie CNI ou passeport" v={val("cniDocument")} on={(v) => upd("cniDocument", v)} />
@@ -310,7 +298,8 @@ function Page() {
               </div>
             )}
 
-            {step === 4 && (
+
+            {step === 3 && (
               <div className="space-y-6">
                 <div>
                   <Label>Choisissez votre moyen de paiement (5 000 FCFA)</Label>
@@ -330,13 +319,30 @@ function Page() {
                 </div>
                 <F label="Numéro de téléphone du paiement" v={val("telephone")} on={(v) => upd("telephone", v)} />
                 <div>
-                  <Label>Créez un mot de passe (8 caractères min.)</Label>
+                  <Label>Créez un mot de passe sécurisé</Label>
                   <Input type="password" value={val("password")} onChange={(e) => upd("password", e.target.value)} />
                 </div>
                 <div className="rounded-md bg-secondary/60 p-4 text-sm text-muted-foreground">
                   En cliquant sur <strong>Payer & confirmer</strong>, vous acceptez les statuts de la MUGEC-CI
                   et autorisez le débit de 5 000 FCFA sur le numéro renseigné.
                 </div>
+              </div>
+            )}
+
+            {step === 4 && (
+              <div className="space-y-6">
+                <div className="rounded-md border border-primary/30 bg-primary/5 p-5">
+                  <h3 className="flex items-center gap-2 font-semibold text-primary"><BadgeCheck className="h-4 w-4" /> Confirmation du dossier</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Après confirmation du paiement, le compte membre, le matricule, la fiche finale avec QR code et la carte CR80 recto/verso sont générés automatiquement.
+                  </p>
+                </div>
+                <dl className="grid gap-3 text-sm md:grid-cols-2">
+                  <Summary k="Nom complet" v={`${data.prenoms ?? ""} ${data.nom ?? ""}`.trim()} />
+                  <Summary k="Téléphone" v={data.telephone ?? "—"} />
+                  <Summary k="Collectivité" v={data.collectivite ?? "—"} />
+                  <Summary k="Paiement" v={`${data.paiement ?? "orange"} — 5 000 FCFA`} />
+                </dl>
               </div>
             )}
 
