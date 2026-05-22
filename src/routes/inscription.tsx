@@ -15,7 +15,7 @@ import { z } from "zod";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { finalizeRegistration } from "@/lib/inscription.functions";
-import { Check, CreditCard, User, Briefcase, ArrowLeft, ArrowRight, Download, FileText } from "lucide-react";
+import { Check, CreditCard, User, Briefcase, ArrowLeft, ArrowRight, Download, FileText, Upload, BadgeCheck } from "lucide-react";
 import { generateFicheAdhesionPDF, generateAutorisationPrelevementPDF, downloadBlob, type DraftData } from "@/lib/pdf-documents";
 
 export const Route = createFileRoute("/inscription")({ component: Page });
@@ -42,20 +42,30 @@ const step2Schema = z.object({
   matriculePro: z.string().trim().max(50).optional().or(z.literal("")),
   dateEmbauche: z.string().optional().or(z.literal("")),
   ayantsDroit: z.string().max(2000).optional().or(z.literal("")),
+  photoIdentite: z.string().optional().or(z.literal("")),
+});
+
+const step3Schema = z.object({
+  ficheSignee: z.string().min(1, "La fiche signée est obligatoire."),
+  autorisationSignee: z.string().min(1, "L’autorisation de prélèvement signée est obligatoire."),
+  cniDocument: z.string().min(1, "La copie CNI ou passeport est obligatoire."),
+  extraitNaissance: z.string().min(1, "L’extrait de naissance est obligatoire."),
 });
 
 type FormData = {
   nom: string; prenoms: string; dateNaissance: string; lieuNaissance: string;
   sexe: "M" | "F"; email: string; telephone: string; cni: string; adresse: string;
   collectivite: string; region: string; direction?: string; fonction: string;
-  matriculePro?: string; dateEmbauche?: string; ayantsDroit?: string;
+  matriculePro?: string; dateEmbauche?: string; ayantsDroit?: string; photoIdentite?: string;
+  ficheSignee?: string; autorisationSignee?: string; cniDocument?: string; extraitNaissance?: string;
   password: string; paiement: "orange" | "mtn" | "wave" | "moov";
 };
 
 const steps = [
-  { id: 1, label: "Identité", icon: User },
-  { id: 2, label: "Profession", icon: Briefcase },
+  { id: 1, label: "Formulaire", icon: User },
+  { id: 2, label: "Documents", icon: FileText },
   { id: 3, label: "Paiement", icon: CreditCard },
+  { id: 4, label: "Confirmation", icon: BadgeCheck },
 ];
 
 function Page() {
@@ -114,7 +124,8 @@ function Page() {
     try {
       if (step === 1) step1Schema.parse(data);
       if (step === 2) step2Schema.parse(data);
-      if (step === 3) {
+      if (step === 3) step3Schema.parse(data);
+      if (step === 4) {
         if (!data.password || data.password.length < 8) {
           toast.error("Le mot de passe doit contenir au moins 8 caractères.");
           return false;
@@ -195,12 +206,12 @@ function Page() {
       <section className="container mx-auto max-w-3xl px-4 py-12">
         <h1 className="text-3xl font-bold tracking-tight">Formulaire d'inscription</h1>
         <p className="mt-2 text-muted-foreground">
-          Étape {step} sur 3 — durée moyenne 5 minutes. Frais d'inscription : <strong>5 000 FCFA</strong>.
+          Étape {step} sur 4 — vos informations sont sauvegardées automatiquement. Frais d'inscription : <strong>5 000 FCFA</strong>.
         </p>
 
         <div className="mt-6">
-          <Progress value={(step / 3) * 100} />
-          <div className="mt-4 grid grid-cols-3 gap-2">
+          <Progress value={(step / 4) * 100} />
+          <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-4">
             {steps.map((s) => (
               <div key={s.id} className={`flex items-center gap-2 rounded-md border p-3 text-sm ${
                 s.id === step ? "border-primary bg-primary/5 text-primary" : s.id < step ? "border-accent/40 bg-accent/5 text-accent" : "text-muted-foreground"
@@ -248,8 +259,7 @@ function Page() {
                     <FileText className="h-4 w-4" /> Documents pré-remplis
                   </h3>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    À partir des informations saisies à l'étape 1, téléchargez, imprimez puis signez
-                    les deux documents officiels avant de finaliser votre inscription.
+                    Téléchargez les documents pré-remplis, imprimez-les, signez-les puis téléversez les scans exigés à l’étape suivante.
                   </p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     <Button type="button" size="sm" variant="outline" onClick={downloadFiche} disabled={generatingPdf !== null}>
@@ -285,6 +295,21 @@ function Page() {
 
             {step === 3 && (
               <div className="space-y-6">
+                <div className="rounded-md border border-primary/30 bg-primary/5 p-4">
+                  <h3 className="flex items-center gap-2 font-semibold text-primary"><Upload className="h-4 w-4" /> Pièces signées à téléverser</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">Formats acceptés : PDF, JPG ou PNG. Taille maximale : 5 Mo par fichier.</p>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <FileF label="Fiche d’inscription signée" v={val("ficheSignee")} on={(v) => upd("ficheSignee", v)} />
+                  <FileF label="Autorisation de prélèvement signée" v={val("autorisationSignee")} on={(v) => upd("autorisationSignee", v)} />
+                  <FileF label="Copie CNI ou passeport" v={val("cniDocument")} on={(v) => upd("cniDocument", v)} />
+                  <FileF label="Extrait de naissance" v={val("extraitNaissance")} on={(v) => upd("extraitNaissance", v)} />
+                </div>
+              </div>
+            )}
+
+            {step === 4 && (
+              <div className="space-y-6">
                 <div>
                   <Label>Choisissez votre moyen de paiement (5 000 FCFA)</Label>
                   <div className="mt-2 grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -307,7 +332,7 @@ function Page() {
                   <Input type="password" value={val("password")} onChange={(e) => upd("password", e.target.value)} />
                 </div>
                 <div className="rounded-md bg-secondary/60 p-4 text-sm text-muted-foreground">
-                  En cliquant sur <strong>Payer & finaliser</strong>, vous acceptez les statuts de la MUGEC-CI
+                  En cliquant sur <strong>Payer & confirmer</strong>, vous acceptez les statuts de la MUGEC-CI
                   et autorisez le débit de 5 000 FCFA sur le numéro renseigné.
                 </div>
               </div>
@@ -317,13 +342,13 @@ function Page() {
               <Button type="button" variant="ghost" onClick={() => setStep((s) => Math.max(1, s - 1))} disabled={step === 1}>
                 <ArrowLeft className="mr-2 h-4 w-4" /> Précédent
               </Button>
-              {step < 3 ? (
+              {step < 4 ? (
                 <Button type="button" onClick={() => validateStep() && setStep((s) => s + 1)}>
                   Continuer <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               ) : (
                 <Button type="button" onClick={submit} disabled={submitting}>
-                  {submitting ? "Traitement…" : "Payer & finaliser"}
+                  {submitting ? "Traitement…" : "Payer & confirmer"}
                 </Button>
               )}
             </div>
@@ -340,6 +365,20 @@ function F({ label, v, on, type = "text" }: { label: string; v: string; on: (v: 
     <div>
       <Label>{label}</Label>
       <Input type={type} value={v} onChange={(e) => on(e.target.value)} />
+    </div>
+  );
+}
+
+function FileF({ label, v, on }: { label: string; v: string; on: (v: string) => void }) {
+  return (
+    <div>
+      <Label>{label}</Label>
+      <Input
+        type="file"
+        accept=".pdf,image/png,image/jpeg"
+        onChange={(e) => on(e.target.files?.[0]?.name ?? "")}
+      />
+      {v ? <p className="mt-1 text-xs text-muted-foreground">Fichier sélectionné : {v}</p> : null}
     </div>
   );
 }
