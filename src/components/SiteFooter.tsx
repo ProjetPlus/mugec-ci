@@ -11,14 +11,15 @@ export function SiteFooter() {
           </p>
         </div>
         <div>
-          <h4 className="mb-3 text-sm font-semibold text-foreground">Liens utiles</h4>
+          <h4 className="mb-3 text-sm font-semibold text-foreground">Documents</h4>
           <ul className="space-y-1 text-sm text-muted-foreground">
-            <li>Adhérer en ligne</li>
-            <li>Espace membre</li>
-            <li>Cotisations</li>
-            <li>FAQ</li>
+            <li><a href="/documents/reglement-interieur-mugec-ci.pdf" target="_blank" rel="noreferrer" className="hover:text-primary">Règlement intérieur</a></li>
+            <li><a href="/documents/fiche-adhesion-vierge.pdf" target="_blank" rel="noreferrer" className="hover:text-primary">Fiche d'adhésion (vierge)</a></li>
+            <li><a href="/documents/autorisation-prelevement-vierge.pdf" target="_blank" rel="noreferrer" className="hover:text-primary">Autorisation de prélèvement</a></li>
+            <li><a href="/inscription" className="hover:text-primary">S'inscrire en ligne</a></li>
           </ul>
         </div>
+
         <div>
           <h4 className="mb-3 text-sm font-semibold text-foreground">Contact</h4>
           <p className="text-sm text-muted-foreground">

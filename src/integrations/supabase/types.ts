@@ -531,6 +531,42 @@ export type Database = {
         }
         Relationships: []
       }
+      registration_drafts: {
+        Row: {
+          created_at: string
+          data: Json
+          email: string
+          id: string
+          nom: string | null
+          prenoms: string | null
+          step: number
+          telephone: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          data?: Json
+          email: string
+          id?: string
+          nom?: string | null
+          prenoms?: string | null
+          step?: number
+          telephone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          data?: Json
+          email?: string
+          id?: string
+          nom?: string | null
+          prenoms?: string | null
+          step?: number
+          telephone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           created_at: string
