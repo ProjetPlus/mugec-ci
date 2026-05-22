@@ -91,10 +91,35 @@ export type Database = {
           },
         ]
       }
+      cron_jobs_log: {
+        Row: {
+          details: Json
+          executed_at: string
+          id: string
+          job_name: string
+          statut: string
+        }
+        Insert: {
+          details?: Json
+          executed_at?: string
+          id?: string
+          job_name: string
+          statut?: string
+        }
+        Update: {
+          details?: Json
+          executed_at?: string
+          id?: string
+          job_name?: string
+          statut?: string
+        }
+        Relationships: []
+      }
       dependants: {
         Row: {
           created_at: string
           date_naissance: string | null
+          extrait_url: string | null
           id: string
           member_id: string
           nom: string
@@ -105,6 +130,7 @@ export type Database = {
         Insert: {
           created_at?: string
           date_naissance?: string | null
+          extrait_url?: string | null
           id?: string
           member_id: string
           nom: string
@@ -115,6 +141,7 @@ export type Database = {
         Update: {
           created_at?: string
           date_naissance?: string | null
+          extrait_url?: string | null
           id?: string
           member_id?: string
           nom?: string
@@ -238,6 +265,75 @@ export type Database = {
         }
         Relationships: []
       }
+      member_documents: {
+        Row: {
+          created_at: string
+          draft_id: string | null
+          file_name: string | null
+          id: string
+          member_id: string | null
+          mime_type: string | null
+          offline_available: boolean
+          rejection_reason: string | null
+          size_bytes: number | null
+          type: string
+          uploaded_at: string
+          url: string
+          validated: boolean
+          validated_at: string | null
+          validated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          draft_id?: string | null
+          file_name?: string | null
+          id?: string
+          member_id?: string | null
+          mime_type?: string | null
+          offline_available?: boolean
+          rejection_reason?: string | null
+          size_bytes?: number | null
+          type: string
+          uploaded_at?: string
+          url: string
+          validated?: boolean
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          draft_id?: string | null
+          file_name?: string | null
+          id?: string
+          member_id?: string | null
+          mime_type?: string | null
+          offline_available?: boolean
+          rejection_reason?: string | null
+          size_bytes?: number | null
+          type?: string
+          uploaded_at?: string
+          url?: string
+          validated?: boolean
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "member_documents_draft_id_fkey"
+            columns: ["draft_id"]
+            isOneToOne: false
+            referencedRelation: "registration_drafts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "member_documents_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       members: {
         Row: {
           adresse: string | null
@@ -249,11 +345,13 @@ export type Database = {
           date_inscription: string | null
           date_naissance: string | null
           direction: string | null
+          droits_ouverts_le: string | null
           email: string | null
           fonction: string | null
           frais_paye: boolean
           id: string
           is_legacy: boolean
+          last_cotisation_at: string | null
           lieu_naissance: string | null
           matricule: string | null
           matricule_pro: string | null
@@ -269,7 +367,10 @@ export type Database = {
           sexe: string | null
           source: string
           statut: string
+          step_completed: number
+          suspended_reason: string | null
           telephone: string | null
+          type_membre: string
           updated_at: string
           user_id: string
           validation_mode: string
@@ -284,11 +385,13 @@ export type Database = {
           date_inscription?: string | null
           date_naissance?: string | null
           direction?: string | null
+          droits_ouverts_le?: string | null
           email?: string | null
           fonction?: string | null
           frais_paye?: boolean
           id?: string
           is_legacy?: boolean
+          last_cotisation_at?: string | null
           lieu_naissance?: string | null
           matricule?: string | null
           matricule_pro?: string | null
@@ -304,7 +407,10 @@ export type Database = {
           sexe?: string | null
           source?: string
           statut?: string
+          step_completed?: number
+          suspended_reason?: string | null
           telephone?: string | null
+          type_membre?: string
           updated_at?: string
           user_id: string
           validation_mode?: string
@@ -319,11 +425,13 @@ export type Database = {
           date_inscription?: string | null
           date_naissance?: string | null
           direction?: string | null
+          droits_ouverts_le?: string | null
           email?: string | null
           fonction?: string | null
           frais_paye?: boolean
           id?: string
           is_legacy?: boolean
+          last_cotisation_at?: string | null
           lieu_naissance?: string | null
           matricule?: string | null
           matricule_pro?: string | null
@@ -339,7 +447,10 @@ export type Database = {
           sexe?: string | null
           source?: string
           statut?: string
+          step_completed?: number
+          suspended_reason?: string | null
           telephone?: string | null
+          type_membre?: string
           updated_at?: string
           user_id?: string
           validation_mode?: string
@@ -531,39 +642,223 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_sessions: {
+        Row: {
+          confirmed_at: string | null
+          created_at: string
+          draft_id: string | null
+          expires_at: string
+          id: string
+          member_id: string | null
+          montant_total: number
+          operateur: string
+          part_miprojet: number
+          part_mutuelle: number
+          provider_payload: Json
+          reference: string | null
+          statut: string
+          telephone: string
+          type: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          confirmed_at?: string | null
+          created_at?: string
+          draft_id?: string | null
+          expires_at?: string
+          id?: string
+          member_id?: string | null
+          montant_total: number
+          operateur: string
+          part_miprojet?: number
+          part_mutuelle?: number
+          provider_payload?: Json
+          reference?: string | null
+          statut?: string
+          telephone: string
+          type: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          confirmed_at?: string | null
+          created_at?: string
+          draft_id?: string | null
+          expires_at?: string
+          id?: string
+          member_id?: string | null
+          montant_total?: number
+          operateur?: string
+          part_miprojet?: number
+          part_mutuelle?: number
+          provider_payload?: Json
+          reference?: string | null
+          statut?: string
+          telephone?: string
+          type?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_sessions_draft_id_fkey"
+            columns: ["draft_id"]
+            isOneToOne: false
+            referencedRelation: "registration_drafts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_sessions_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prestation_requests: {
+        Row: {
+          closed_at: string | null
+          created_at: string
+          id: string
+          member_id: string
+          montant_applicable: number
+          motif_rejet: string | null
+          pj_urls: Json
+          statut_global: string
+          step_validation: number
+          submitted_at: string
+          type_evenement: string
+          updated_at: string
+        }
+        Insert: {
+          closed_at?: string | null
+          created_at?: string
+          id?: string
+          member_id: string
+          montant_applicable?: number
+          motif_rejet?: string | null
+          pj_urls?: Json
+          statut_global?: string
+          step_validation?: number
+          submitted_at?: string
+          type_evenement: string
+          updated_at?: string
+        }
+        Update: {
+          closed_at?: string | null
+          created_at?: string
+          id?: string
+          member_id?: string
+          montant_applicable?: number
+          motif_rejet?: string | null
+          pj_urls?: Json
+          statut_global?: string
+          step_validation?: number
+          submitted_at?: string
+          type_evenement?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prestation_requests_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prestation_validations: {
+        Row: {
+          action: string
+          id: string
+          metadata: Json
+          motif: string | null
+          niveau: number
+          request_id: string
+          role_requis: string
+          validated_at: string
+          validateur_id: string
+        }
+        Insert: {
+          action: string
+          id?: string
+          metadata?: Json
+          motif?: string | null
+          niveau: number
+          request_id: string
+          role_requis: string
+          validated_at?: string
+          validateur_id: string
+        }
+        Update: {
+          action?: string
+          id?: string
+          metadata?: Json
+          motif?: string | null
+          niveau?: number
+          request_id?: string
+          role_requis?: string
+          validated_at?: string
+          validateur_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prestation_validations_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "prestation_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       registration_drafts: {
         Row: {
           created_at: string
           data: Json
+          device_fingerprint: string | null
           email: string
+          expires_at: string
           id: string
+          last_seen: string
           nom: string | null
           prenoms: string | null
           step: number
           telephone: string | null
           updated_at: string
+          uploaded_documents: Json
         }
         Insert: {
           created_at?: string
           data?: Json
+          device_fingerprint?: string | null
           email: string
+          expires_at?: string
           id?: string
+          last_seen?: string
           nom?: string | null
           prenoms?: string | null
           step?: number
           telephone?: string | null
           updated_at?: string
+          uploaded_documents?: Json
         }
         Update: {
           created_at?: string
           data?: Json
+          device_fingerprint?: string | null
           email?: string
+          expires_at?: string
           id?: string
+          last_seen?: string
           nom?: string | null
           prenoms?: string | null
           step?: number
           telephone?: string | null
           updated_at?: string
+          uploaded_documents?: Json
         }
         Relationships: []
       }
@@ -693,6 +988,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_prestation_amount: {
+        Args: { _date_inscription?: string; _type: string }
+        Returns: number
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -702,6 +1001,31 @@ export type Database = {
       }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
+      open_member_rights_after_90_days: { Args: never; Returns: number }
+      role_for_prestation_step: { Args: { _step: number }; Returns: string }
+      validate_prestation_step: {
+        Args: { _action: string; _motif?: string; _request_id: string }
+        Returns: {
+          closed_at: string | null
+          created_at: string
+          id: string
+          member_id: string
+          montant_applicable: number
+          motif_rejet: string | null
+          pj_urls: Json
+          statut_global: string
+          step_validation: number
+          submitted_at: string
+          type_evenement: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "prestation_requests"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
     }
     Enums: {
       app_role:
@@ -718,6 +1042,10 @@ export type Database = {
         | "secretaire_regional"
         | "tresorier_regional"
         | "member"
+        | "directeur_executif"
+        | "comite_controle"
+        | "conseil_sages"
+        | "delegue_section"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -859,6 +1187,10 @@ export const Constants = {
         "secretaire_regional",
         "tresorier_regional",
         "member",
+        "directeur_executif",
+        "comite_controle",
+        "conseil_sages",
+        "delegue_section",
       ],
     },
   },

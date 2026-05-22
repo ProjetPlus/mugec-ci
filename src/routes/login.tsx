@@ -59,7 +59,7 @@ function Page() {
               </Button>
             </form>
             <p className="mt-6 text-center text-sm text-muted-foreground">
-              Pas encore membre ? <Link to="/inscription" className="text-primary underline">Adhérer</Link>
+              Pas encore membre ? <Link to="/inscription" className="text-primary underline">S'inscrire</Link>
             </p>
           </CardContent>
         </Card>

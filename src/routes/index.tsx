@@ -11,10 +11,10 @@ export const Route = createFileRoute("/")({
 });
 
 const stats = [
-  { label: "Adhérents potentiels", value: "50 000+" },
+  { label: "Membres potentiels", value: "50 000+" },
   { label: "Collectivités couvertes", value: "201" },
   { label: "Régions", value: "31" },
-  { label: "Frais d'adhésion", value: "5 000 F" },
+  { label: "Frais d’inscription", value: "5 000 F" },
 ];
 
 const features = [

@@ -79,13 +79,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         name: "description",
         content:
-          "Plateforme officielle de la MUGEC-CI : adhésion en ligne, espace membre, cotisations et services aux agents des collectivités territoriales de Côte d'Ivoire.",
+          "Plateforme officielle de la MUGEC-CI : inscription en ligne, espace membre, cotisations et services aux agents des collectivités territoriales de Côte d'Ivoire.",
       },
       { name: "author", content: "MUGEC-CI" },
       { property: "og:title", content: "MUGEC-CI — Mutuelle Générale du Personnel des Collectivités Territoriales" },
       {
         property: "og:description",
-        content: "Adhérez à la MUGEC-CI en ligne et accédez à votre espace membre sécurisé.",
+        content: "Inscrivez-vous à la MUGEC-CI en ligne et accédez à votre espace membre sécurisé.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:title", content: "MUGEC-CI — Mutuelle Générale du Personnel des Collectivités Territoriales" },

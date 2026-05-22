@@ -15,7 +15,7 @@ import { z } from "zod";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { finalizeRegistration } from "@/lib/inscription.functions";
-import { Check, CreditCard, User, Briefcase, ArrowLeft, ArrowRight, Download, FileText } from "lucide-react";
+import { Check, CreditCard, User, ArrowLeft, ArrowRight, Download, FileText, BadgeCheck } from "lucide-react";
 import { generateFicheAdhesionPDF, generateAutorisationPrelevementPDF, downloadBlob, type DraftData } from "@/lib/pdf-documents";
 
 export const Route = createFileRoute("/inscription")({ component: Page });
@@ -25,37 +25,49 @@ const DRAFT_KEY = "mugec_inscription_draft_v1";
 const step1Schema = z.object({
   nom: z.string().trim().min(2, "Nom requis").max(100),
   prenoms: z.string().trim().min(2, "Prénoms requis").max(150),
-  dateNaissance: z.string().min(1, "Date de naissance requise"),
+  dateNaissance: z.string().min(1, "Date de naissance requise").refine((v) => {
+    const d = new Date(v);
+    return !Number.isNaN(d.getTime()) && d <= new Date(new Date().setFullYear(new Date().getFullYear() - 18));
+  }, "L'inscription est réservée aux personnes majeures."),
   lieuNaissance: z.string().trim().min(2).max(100),
   sexe: z.enum(["M", "F"]),
   email: z.string().trim().email("Email invalide").max(255),
   telephone: z.string().trim().min(8, "Numéro invalide").max(20),
   cni: z.string().trim().min(4).max(30),
   adresse: z.string().trim().min(2).max(255),
-});
-
-const step2Schema = z.object({
   collectivite: z.string().trim().min(2, "Collectivité requise").max(150),
   region: z.string().trim().min(2).max(100),
   direction: z.string().trim().max(150).optional().or(z.literal("")),
   fonction: z.string().trim().min(2).max(150),
-  matriculePro: z.string().trim().max(50).optional().or(z.literal("")),
+  matriculePro: z.string().trim().min(2, "Matricule Solde requis").max(50),
   dateEmbauche: z.string().optional().or(z.literal("")),
   ayantsDroit: z.string().max(2000).optional().or(z.literal("")),
+  photoIdentite: z.string().min(1, "La photo d’identité est obligatoire."),
 });
+
+const step2Schema = z.object({
+  ficheSignee: z.string().min(1, "La fiche signée est obligatoire."),
+  autorisationSignee: z.string().min(1, "L’autorisation de prélèvement signée est obligatoire."),
+  cniDocument: z.string().min(1, "La copie CNI ou passeport est obligatoire."),
+  extraitNaissance: z.string().min(1, "L’extrait de naissance est obligatoire."),
+});
+
+const passwordSchema = z.string().min(8).regex(/[A-Z]/).regex(/[0-9]/).regex(/[^A-Za-z0-9]/);
 
 type FormData = {
   nom: string; prenoms: string; dateNaissance: string; lieuNaissance: string;
   sexe: "M" | "F"; email: string; telephone: string; cni: string; adresse: string;
   collectivite: string; region: string; direction?: string; fonction: string;
-  matriculePro?: string; dateEmbauche?: string; ayantsDroit?: string;
+  matriculePro?: string; dateEmbauche?: string; ayantsDroit?: string; photoIdentite?: string;
+  ficheSignee?: string; autorisationSignee?: string; cniDocument?: string; extraitNaissance?: string;
   password: string; paiement: "orange" | "mtn" | "wave" | "moov";
 };
 
 const steps = [
-  { id: 1, label: "Identité", icon: User },
-  { id: 2, label: "Profession", icon: Briefcase },
+  { id: 1, label: "Formulaire", icon: User },
+  { id: 2, label: "Documents signés", icon: FileText },
   { id: 3, label: "Paiement", icon: CreditCard },
+  { id: 4, label: "Confirmation", icon: BadgeCheck },
 ];
 
 function Page() {
@@ -98,7 +110,7 @@ function Page() {
     setGeneratingPdf("fiche");
     try {
       const blob = await generateFicheAdhesionPDF(data as DraftData);
-      downloadBlob(blob, `fiche-adhesion-${data.nom ?? "mugec"}.pdf`);
+      downloadBlob(blob, `fiche-inscription-${data.nom ?? "mugec"}.pdf`);
     } finally { setGeneratingPdf(null); }
   }
   async function downloadAutorisation() {
@@ -115,8 +127,8 @@ function Page() {
       if (step === 1) step1Schema.parse(data);
       if (step === 2) step2Schema.parse(data);
       if (step === 3) {
-        if (!data.password || data.password.length < 8) {
-          toast.error("Le mot de passe doit contenir au moins 8 caractères.");
+        if (!data.password || !passwordSchema.safeParse(data.password).success) {
+          toast.error("Le mot de passe doit contenir 8 caractères, une majuscule, un chiffre et un caractère spécial.");
           return false;
         }
       }
@@ -195,12 +207,12 @@ function Page() {
       <section className="container mx-auto max-w-3xl px-4 py-12">
         <h1 className="text-3xl font-bold tracking-tight">Formulaire d'inscription</h1>
         <p className="mt-2 text-muted-foreground">
-          Étape {step} sur 3 — durée moyenne 5 minutes. Frais d'inscription : <strong>5 000 FCFA</strong>.
+          Étape {step} sur 4 — vos informations sont sauvegardées automatiquement. Frais d'inscription : <strong>5 000 FCFA</strong>.
         </p>
 
         <div className="mt-6">
-          <Progress value={(step / 3) * 100} />
-          <div className="mt-4 grid grid-cols-3 gap-2">
+          <Progress value={(step / 4) * 100} />
+          <div className="mt-4 grid grid-cols-2 gap-2 md:grid-cols-4">
             {steps.map((s) => (
               <div key={s.id} className={`flex items-center gap-2 rounded-md border p-3 text-sm ${
                 s.id === step ? "border-primary bg-primary/5 text-primary" : s.id < step ? "border-accent/40 bg-accent/5 text-accent" : "text-muted-foreground"
@@ -232,11 +244,23 @@ function Page() {
                   </Select>
                 </div>
                 <F label="N° CNI" v={val("cni")} on={(v) => upd("cni", v)} />
+                <F label="Matricule Solde" v={val("matriculePro")} on={(v) => upd("matriculePro", v)} />
                 <F label="E-mail" type="email" v={val("email")} on={(v) => upd("email", v)} />
                 <F label="Téléphone (WhatsApp)" v={val("telephone")} on={(v) => upd("telephone", v)} />
+                <FileF label="Photo d’identité (JPG/PNG, max 2 Mo)" v={val("photoIdentite")} on={(v) => upd("photoIdentite", v)} />
+                <F label="Collectivité d'origine" v={val("collectivite")} on={(v) => upd("collectivite", v)} />
+                <F label="Région" v={val("region")} on={(v) => upd("region", v)} />
+                <F label="Direction / Service" v={val("direction")} on={(v) => upd("direction", v)} />
+                <F label="Fonction" v={val("fonction")} on={(v) => upd("fonction", v)} />
+                <F label="Date d'embauche" type="date" v={val("dateEmbauche")} on={(v) => upd("dateEmbauche", v)} />
                 <div className="md:col-span-2">
                   <Label>Adresse</Label>
                   <Textarea value={val("adresse")} onChange={(e) => upd("adresse", e.target.value)} rows={2} />
+                </div>
+                <div className="md:col-span-2">
+                  <Label>Ayants-droit (père, mère, conjoint, enfants — maximum 4 enfants)</Label>
+                  <Textarea value={val("ayantsDroit")} onChange={(e) => upd("ayantsDroit", e.target.value)} rows={3}
+                    placeholder="Ex : Père — Kouadio Koffi. Mère — Aya Koffi. Conjoint — ... Enfants : nom, prénoms, date de naissance." />
                 </div>
               </div>
             )}
@@ -248,13 +272,12 @@ function Page() {
                     <FileText className="h-4 w-4" /> Documents pré-remplis
                   </h3>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    À partir des informations saisies à l'étape 1, téléchargez, imprimez puis signez
-                    les deux documents officiels avant de finaliser votre inscription.
+                    Téléchargez les documents pré-remplis, imprimez-les, signez-les puis téléversez les scans exigés à l’étape suivante.
                   </p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     <Button type="button" size="sm" variant="outline" onClick={downloadFiche} disabled={generatingPdf !== null}>
                       <Download className="mr-2 h-4 w-4" />
-                      {generatingPdf === "fiche" ? "Génération…" : "Fiche d'adhésion (pré-remplie)"}
+                      {generatingPdf === "fiche" ? "Génération…" : "Fiche d’inscription (pré-remplie)"}
                     </Button>
                     <Button type="button" size="sm" variant="outline" onClick={downloadAutorisation} disabled={generatingPdf !== null}>
                       <Download className="mr-2 h-4 w-4" />
@@ -267,17 +290,10 @@ function Page() {
                   </div>
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
-                  <F label="Collectivité (mairie, conseil régional…)" v={val("collectivite")} on={(v) => upd("collectivite", v)} />
-                  <F label="Région" v={val("region")} on={(v) => upd("region", v)} />
-                  <F label="Direction / Service" v={val("direction")} on={(v) => upd("direction", v)} />
-                  <F label="Fonction" v={val("fonction")} on={(v) => upd("fonction", v)} />
-                  <F label="Matricule professionnel" v={val("matriculePro")} on={(v) => upd("matriculePro", v)} />
-                  <F label="Date d'embauche" type="date" v={val("dateEmbauche")} on={(v) => upd("dateEmbauche", v)} />
-                  <div className="md:col-span-2">
-                    <Label>Ayants-droit (père, mère, conjoint, enfants…)</Label>
-                    <Textarea value={val("ayantsDroit")} onChange={(e) => upd("ayantsDroit", e.target.value)} rows={3}
-                      placeholder="Ex : Conjoint — Aya Koffi, née le 12/03/1988. Enfants : Marc (2015), Léa (2019)…" />
-                  </div>
+                  <FileF label="Fiche d’inscription signée" v={val("ficheSignee")} on={(v) => upd("ficheSignee", v)} />
+                  <FileF label="Autorisation de prélèvement signée" v={val("autorisationSignee")} on={(v) => upd("autorisationSignee", v)} />
+                  <FileF label="Copie CNI ou passeport" v={val("cniDocument")} on={(v) => upd("cniDocument", v)} />
+                  <FileF label="Extrait de naissance" v={val("extraitNaissance")} on={(v) => upd("extraitNaissance", v)} />
                 </div>
               </div>
             )}
@@ -303,13 +319,30 @@ function Page() {
                 </div>
                 <F label="Numéro de téléphone du paiement" v={val("telephone")} on={(v) => upd("telephone", v)} />
                 <div>
-                  <Label>Créez un mot de passe (8 caractères min.)</Label>
+                  <Label>Créez un mot de passe sécurisé</Label>
                   <Input type="password" value={val("password")} onChange={(e) => upd("password", e.target.value)} />
                 </div>
                 <div className="rounded-md bg-secondary/60 p-4 text-sm text-muted-foreground">
-                  En cliquant sur <strong>Payer & finaliser</strong>, vous acceptez les statuts de la MUGEC-CI
+                  En cliquant sur <strong>Payer & confirmer</strong>, vous acceptez les statuts de la MUGEC-CI
                   et autorisez le débit de 5 000 FCFA sur le numéro renseigné.
                 </div>
+              </div>
+            )}
+
+            {step === 4 && (
+              <div className="space-y-6">
+                <div className="rounded-md border border-primary/30 bg-primary/5 p-5">
+                  <h3 className="flex items-center gap-2 font-semibold text-primary"><BadgeCheck className="h-4 w-4" /> Confirmation du dossier</h3>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Après confirmation du paiement, le compte membre, le matricule, la fiche finale avec QR code et la carte CR80 recto/verso sont générés automatiquement.
+                  </p>
+                </div>
+                <dl className="grid gap-3 text-sm md:grid-cols-2">
+                  <Summary k="Nom complet" v={`${data.prenoms ?? ""} ${data.nom ?? ""}`.trim()} />
+                  <Summary k="Téléphone" v={data.telephone ?? "—"} />
+                  <Summary k="Collectivité" v={data.collectivite ?? "—"} />
+                  <Summary k="Paiement" v={`${data.paiement ?? "orange"} — 5 000 FCFA`} />
+                </dl>
               </div>
             )}
 
@@ -317,13 +350,13 @@ function Page() {
               <Button type="button" variant="ghost" onClick={() => setStep((s) => Math.max(1, s - 1))} disabled={step === 1}>
                 <ArrowLeft className="mr-2 h-4 w-4" /> Précédent
               </Button>
-              {step < 3 ? (
+              {step < 4 ? (
                 <Button type="button" onClick={() => validateStep() && setStep((s) => s + 1)}>
                   Continuer <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               ) : (
                 <Button type="button" onClick={submit} disabled={submitting}>
-                  {submitting ? "Traitement…" : "Payer & finaliser"}
+                  {submitting ? "Traitement…" : "Payer & confirmer"}
                 </Button>
               )}
             </div>
@@ -340,6 +373,29 @@ function F({ label, v, on, type = "text" }: { label: string; v: string; on: (v: 
     <div>
       <Label>{label}</Label>
       <Input type={type} value={v} onChange={(e) => on(e.target.value)} />
+    </div>
+  );
+}
+
+function FileF({ label, v, on }: { label: string; v: string; on: (v: string) => void }) {
+  return (
+    <div>
+      <Label>{label}</Label>
+      <Input
+        type="file"
+        accept=".pdf,image/png,image/jpeg"
+        onChange={(e) => on(e.target.files?.[0]?.name ?? "")}
+      />
+      {v ? <p className="mt-1 text-xs text-muted-foreground">Fichier sélectionné : {v}</p> : null}
+    </div>
+  );
+}
+
+function Summary({ k, v }: { k: string; v: string }) {
+  return (
+    <div className="rounded-md border bg-background/80 p-3">
+      <dt className="text-xs text-muted-foreground">{k}</dt>
+      <dd className="mt-1 font-medium text-foreground">{v || "—"}</dd>
     </div>
   );
 }

@@ -1,5 +1,5 @@
 /**
- * Génération côté client des documents pré-remplis (fiche d'adhésion +
+ * Génération côté client des documents pré-remplis (fiche d’inscription +
  * autorisation de prélèvement) avec filigrane MUGEC-CI.
  */
 import jsPDF from "jspdf";
@@ -94,7 +94,7 @@ export async function generateFicheAdhesionPDF(d: DraftData): Promise<Blob> {
   const pdf = new jsPDF({ unit: "mm", format: "a4" });
   const wm = await loadWatermark();
   addWatermark(pdf, wm);
-  header(pdf, "FICHE D'ADHÉSION");
+  header(pdf, "FICHE D’INSCRIPTION");
 
   let y = 60;
   field(pdf, "Nom", d.nom, 20, y); field(pdf, "Prénoms", d.prenoms, 110, y, 80); y += 14;
@@ -115,7 +115,7 @@ export async function generateFicheAdhesionPDF(d: DraftData): Promise<Blob> {
 
   pdf.setFont("helvetica", "normal"); pdf.setFontSize(9);
   pdf.text(
-    "Je soussigné(e), certifie l'exactitude des informations ci-dessus et sollicite mon adhésion à la MUGEC-CI. Je déclare avoir pris connaissance des statuts et du règlement intérieur.",
+    "Je soussigné(e), certifie l'exactitude des informations ci-dessus et sollicite mon inscription à la MUGEC-CI. Je déclare avoir pris connaissance des statuts et du règlement intérieur.",
     20, y, { maxWidth: 170 },
   );
   y += 22;
