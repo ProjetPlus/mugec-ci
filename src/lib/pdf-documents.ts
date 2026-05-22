@@ -41,16 +41,18 @@ function addWatermark(pdf: jsPDF, dataUrl: string) {
   const pageW = pdf.internal.pageSize.getWidth();
   const pageH = pdf.internal.pageSize.getHeight();
   const w = pageW * 0.7;
-  const h = w * 0.7; // ratio approximatif image
+  const h = w * 0.7;
   const x = (pageW - w) / 2;
   const y = (pageH - h) / 2;
-  // @ts-expect-error setGState exists in jspdf runtime
-  const g = pdf.GState ? new pdf.GState({ opacity: 0.08 }) : null;
-  // @ts-expect-error setGState
-  if (g) pdf.setGState(g);
+  const anyPdf = pdf as unknown as {
+    GState: new (o: { opacity: number }) => unknown;
+    setGState: (g: unknown) => void;
+  };
+  const g = new anyPdf.GState({ opacity: 0.08 });
+  anyPdf.setGState(g);
   pdf.addImage(dataUrl, "PNG", x, y, w, h, undefined, "FAST");
-  // @ts-expect-error reset
-  if (g) pdf.setGState(new pdf.GState({ opacity: 1 }));
+  anyPdf.setGState(new anyPdf.GState({ opacity: 1 }));
+
 }
 
 function header(pdf: jsPDF, title: string) {
