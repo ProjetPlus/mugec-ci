@@ -8,6 +8,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { Watermark } from "@/components/Watermark";
 import logo from "@/assets/mugec-logo.png";
+import watermarkUrl from "@/assets/mugec-watermark.png";
 import { Download, Printer, Loader2 } from "lucide-react";
 import QRCode from "qrcode";
 import jsPDF from "jspdf";
@@ -29,7 +30,25 @@ type Member = {
   cni?: string;
   date_naissance?: string;
   lieu_naissance?: string;
+  date_inscription?: string;
+  statut?: string;
+  type_membre?: string;
+  photo_url?: string;
+  qr_code?: string;
 };
+
+let imageCache: Record<string, string> = {};
+async function imageToDataUrl(src: string) {
+  if (imageCache[src]) return imageCache[src];
+  const res = await fetch(src);
+  const blob = await res.blob();
+  imageCache[src] = await new Promise<string>((resolve) => {
+    const fr = new FileReader();
+    fr.onload = () => resolve(fr.result as string);
+    fr.readAsDataURL(blob);
+  });
+  return imageCache[src];
+}
 
 function Page() {
   const { user, loading } = useAuth();
