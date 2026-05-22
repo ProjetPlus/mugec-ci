@@ -177,8 +177,10 @@ function Page() {
         },
       });
 
+      try { localStorage.removeItem(DRAFT_KEY); } catch { /* ignore */ }
       toast.success("Inscription validée. Bienvenue !");
       nav({ to: "/membre" });
+
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Erreur inconnue";
       toast.error(msg);
@@ -240,20 +242,46 @@ function Page() {
             )}
 
             {step === 2 && (
-              <div className="grid gap-4 md:grid-cols-2">
-                <F label="Collectivité (mairie, conseil régional…)" v={val("collectivite")} on={(v) => upd("collectivite", v)} />
-                <F label="Région" v={val("region")} on={(v) => upd("region", v)} />
-                <F label="Direction / Service" v={val("direction")} on={(v) => upd("direction", v)} />
-                <F label="Fonction" v={val("fonction")} on={(v) => upd("fonction", v)} />
-                <F label="Matricule professionnel" v={val("matriculePro")} on={(v) => upd("matriculePro", v)} />
-                <F label="Date d'embauche" type="date" v={val("dateEmbauche")} on={(v) => upd("dateEmbauche", v)} />
-                <div className="md:col-span-2">
-                  <Label>Ayants-droit (père, mère, conjoint, enfants…)</Label>
-                  <Textarea value={val("ayantsDroit")} onChange={(e) => upd("ayantsDroit", e.target.value)} rows={3}
-                    placeholder="Ex : Conjoint — Aya Koffi, née le 12/03/1988. Enfants : Marc (2015), Léa (2019)…" />
+              <div className="space-y-6">
+                <div className="rounded-md border border-primary/30 bg-primary/5 p-4">
+                  <h3 className="flex items-center gap-2 font-semibold text-primary">
+                    <FileText className="h-4 w-4" /> Documents pré-remplis
+                  </h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    À partir des informations saisies à l'étape 1, téléchargez, imprimez puis signez
+                    les deux documents officiels avant de finaliser votre inscription.
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Button type="button" size="sm" variant="outline" onClick={downloadFiche} disabled={generatingPdf !== null}>
+                      <Download className="mr-2 h-4 w-4" />
+                      {generatingPdf === "fiche" ? "Génération…" : "Fiche d'adhésion (pré-remplie)"}
+                    </Button>
+                    <Button type="button" size="sm" variant="outline" onClick={downloadAutorisation} disabled={generatingPdf !== null}>
+                      <Download className="mr-2 h-4 w-4" />
+                      {generatingPdf === "autorisation" ? "Génération…" : "Autorisation de prélèvement (pré-remplie)"}
+                    </Button>
+                    <a href="/documents/reglement-interieur-mugec-ci.pdf" target="_blank" rel="noreferrer"
+                       className="inline-flex h-9 items-center rounded-md border px-3 text-sm hover:bg-secondary">
+                      <FileText className="mr-2 h-4 w-4" /> Règlement intérieur
+                    </a>
+                  </div>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <F label="Collectivité (mairie, conseil régional…)" v={val("collectivite")} on={(v) => upd("collectivite", v)} />
+                  <F label="Région" v={val("region")} on={(v) => upd("region", v)} />
+                  <F label="Direction / Service" v={val("direction")} on={(v) => upd("direction", v)} />
+                  <F label="Fonction" v={val("fonction")} on={(v) => upd("fonction", v)} />
+                  <F label="Matricule professionnel" v={val("matriculePro")} on={(v) => upd("matriculePro", v)} />
+                  <F label="Date d'embauche" type="date" v={val("dateEmbauche")} on={(v) => upd("dateEmbauche", v)} />
+                  <div className="md:col-span-2">
+                    <Label>Ayants-droit (père, mère, conjoint, enfants…)</Label>
+                    <Textarea value={val("ayantsDroit")} onChange={(e) => upd("ayantsDroit", e.target.value)} rows={3}
+                      placeholder="Ex : Conjoint — Aya Koffi, née le 12/03/1988. Enfants : Marc (2015), Léa (2019)…" />
+                  </div>
                 </div>
               </div>
             )}
+
 
             {step === 3 && (
               <div className="space-y-6">
