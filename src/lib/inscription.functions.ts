@@ -88,15 +88,15 @@ export const finalizeRegistration = createServerFn({ method: "POST" })
     if (subErr) throw new Error(subErr.message);
 
 
-    // 3) Trace MiPROJET privée
+    // 3) Trace MiPROJET privée (initialement en attente jusqu'à confirmation du paiement)
     await supabaseAdmin.from("transactions_miprojet").insert({
       subscription_id: sub.id,
       montant: 1000,
       statut: "en_attente",
-      reference: data.payment_reference,
+      reference: null,
     });
 
-    // 4) Notifications (SMS + WhatsApp + Email)
+    // 4) Notification d'accueil uniquement (pas de "payment_confirmed" tant que le webhook n'a pas confirmé)
     const baseUrl = "https://mugec-ci.ivoireprojet.com";
     const ctx = {
       prenoms: member.prenoms,
@@ -107,25 +107,13 @@ export const finalizeRegistration = createServerFn({ method: "POST" })
       member_url: `${baseUrl}/membre`,
       montant: 5000,
       operateur: data.paiement_methode,
-      reference: data.payment_reference,
     } as const;
 
     try {
       const { dispatchNotification } = await import("./notifications.functions");
-      // exécuter localement (handler)
       await dispatchNotification({
         data: {
-          event: "registration_validated",
-          memberId: member.id,
-          userId,
-          to: { email: member.email ?? undefined, phone: member.telephone ?? undefined, whatsapp: member.telephone ?? undefined },
-          channels: ["email", "sms", "whatsapp"],
-          context: ctx,
-        },
-      });
-      await dispatchNotification({
-        data: {
-          event: "payment_confirmed",
+          event: "registration_pending_payment",
           memberId: member.id,
           userId,
           to: { email: member.email ?? undefined, phone: member.telephone ?? undefined, whatsapp: member.telephone ?? undefined },
@@ -136,6 +124,7 @@ export const finalizeRegistration = createServerFn({ method: "POST" })
     } catch (e) {
       console.error("notif dispatch failed", e);
     }
+
 
     return { member, subscription: sub };
   });
