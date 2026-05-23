@@ -35,7 +35,9 @@ export const finalizeRegistration = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { userId } = context;
 
-    // 1) Insert membre (RLS : auth.uid() = user_id grâce au token)
+    // SECURITY: server-side never trusts a client-generated payment reference.
+    // Registration is created as PENDING; activation only happens via a verified
+    // payment-webhook (handled by an admin/server route), not from the browser.
     const { data: member, error: memberErr } = await supabaseAdmin
       .from("members")
       .insert({
@@ -56,18 +58,18 @@ export const finalizeRegistration = createServerFn({ method: "POST" })
         matricule_pro: data.matricule_pro,
         date_embauche: data.date_embauche || null,
         ayants_droit: data.ayants_droit,
-        statut: "actif",
+        statut: "en_attente",
         paiement_methode: data.paiement_methode,
-        frais_paye: true,
-        payment_reference: data.payment_reference,
-        payment_confirmed_at: new Date().toISOString(),
+        frais_paye: false,
+        payment_reference: null,
+        payment_confirmed_at: null,
         validation_mode: "automatique",
       })
       .select()
       .single();
     if (memberErr) throw new Error(memberErr.message);
 
-    // 2) Souscription d'inscription + split 4000/1000
+    // 2) Souscription d'inscription (en attente de confirmation paiement)
     const { data: sub, error: subErr } = await supabaseAdmin
       .from("subscriptions")
       .insert({
@@ -76,14 +78,15 @@ export const finalizeRegistration = createServerFn({ method: "POST" })
         montant_total: 5000,
         part_mutuelle: 4000,
         part_miprojet: 1000,
-        statut_paiement: "paye",
+        statut_paiement: "en_attente",
         operateur: data.paiement_methode,
-        reference_transaction: data.payment_reference,
-        paid_at: new Date().toISOString(),
+        reference_transaction: null,
+        paid_at: null,
       })
       .select()
       .single();
     if (subErr) throw new Error(subErr.message);
+
 
     // 3) Trace MiPROJET privée
     await supabaseAdmin.from("transactions_miprojet").insert({
