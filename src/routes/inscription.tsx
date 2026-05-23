@@ -27,29 +27,31 @@ const step1Schema = z.object({
   prenoms: z.string().trim().min(2, "Prénoms requis").max(150),
   dateNaissance: z.string().min(1, "Date de naissance requise").refine((v) => {
     const d = new Date(v);
-    return !Number.isNaN(d.getTime()) && d <= new Date(new Date().setFullYear(new Date().getFullYear() - 18));
-  }, "L'inscription est réservée aux personnes majeures."),
-  lieuNaissance: z.string().trim().min(2).max(100),
+    if (Number.isNaN(d.getTime())) return false;
+    const eighteen = new Date(); eighteen.setFullYear(eighteen.getFullYear() - 18);
+    return d <= eighteen;
+  }, "Vous devez être majeur(e) (18 ans minimum)."),
+  lieuNaissance: z.string().trim().min(2, "Lieu de naissance requis").max(100),
   sexe: z.enum(["M", "F"]),
   email: z.string().trim().email("Email invalide").max(255),
-  telephone: z.string().trim().min(8, "Numéro invalide").max(20),
-  cni: z.string().trim().min(4).max(30),
-  adresse: z.string().trim().min(2).max(255),
+  telephone: z.string().trim().min(8, "Téléphone requis").max(20),
+  cni: z.string().trim().min(4, "N° CNI / Passeport requis").max(30),
+  adresse: z.string().trim().min(2, "Adresse postale requise").max(255),
   collectivite: z.string().trim().min(2, "Collectivité requise").max(150),
-  region: z.string().trim().min(2).max(100),
+  region: z.string().trim().max(100).optional().or(z.literal("")),
   direction: z.string().trim().max(150).optional().or(z.literal("")),
-  fonction: z.string().trim().min(2).max(150),
+  fonction: z.string().trim().max(150).optional().or(z.literal("")),
   matriculePro: z.string().trim().min(2, "Matricule Solde requis").max(50),
   dateEmbauche: z.string().optional().or(z.literal("")),
   ayantsDroit: z.string().max(2000).optional().or(z.literal("")),
-  photoIdentite: z.string().min(1, "La photo d’identité est obligatoire."),
+  photoIdentite: z.string().optional().or(z.literal("")),
 });
 
 const step2Schema = z.object({
-  ficheSignee: z.string().min(1, "La fiche signée est obligatoire."),
-  autorisationSignee: z.string().min(1, "L’autorisation de prélèvement signée est obligatoire."),
+  ficheSignee: z.string().min(1, "La fiche d'adhésion signée est obligatoire."),
+  autorisationSignee: z.string().min(1, "L'autorisation de prélèvement signée est obligatoire."),
   cniDocument: z.string().min(1, "La copie CNI ou passeport est obligatoire."),
-  extraitNaissance: z.string().min(1, "L’extrait de naissance est obligatoire."),
+  extraitNaissance: z.string().min(1, "L'extrait de naissance est obligatoire."),
 });
 
 const passwordSchema = z.string().min(8).regex(/[A-Z]/).regex(/[0-9]/).regex(/[^A-Za-z0-9]/);
@@ -134,7 +136,11 @@ function Page() {
       }
       return true;
     } catch (err) {
-      if (err instanceof z.ZodError) toast.error(err.errors[0].message);
+      if (err instanceof z.ZodError) {
+        err.errors.slice(0, 3).forEach((e) => toast.error(e.message));
+      } else {
+        toast.error("Veuillez vérifier le formulaire.");
+      }
       return false;
     }
   }
