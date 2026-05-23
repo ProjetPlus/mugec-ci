@@ -35,7 +35,9 @@ export const finalizeRegistration = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { userId } = context;
 
-    // 1) Insert membre (RLS : auth.uid() = user_id grâce au token)
+    // SECURITY: server-side never trusts a client-generated payment reference.
+    // Registration is created as PENDING; activation only happens via a verified
+    // payment-webhook (handled by an admin/server route), not from the browser.
     const { data: member, error: memberErr } = await supabaseAdmin
       .from("members")
       .insert({
@@ -56,18 +58,18 @@ export const finalizeRegistration = createServerFn({ method: "POST" })
         matricule_pro: data.matricule_pro,
         date_embauche: data.date_embauche || null,
         ayants_droit: data.ayants_droit,
-        statut: "actif",
+        statut: "en_attente",
         paiement_methode: data.paiement_methode,
-        frais_paye: true,
-        payment_reference: data.payment_reference,
-        payment_confirmed_at: new Date().toISOString(),
+        frais_paye: false,
+        payment_reference: null,
+        payment_confirmed_at: null,
         validation_mode: "automatique",
       })
       .select()
       .single();
     if (memberErr) throw new Error(memberErr.message);
 
-    // 2) Souscription d'inscription + split 4000/1000
+    // 2) Souscription d'inscription (en attente de confirmation paiement)
     const { data: sub, error: subErr } = await supabaseAdmin
       .from("subscriptions")
       .insert({
@@ -76,24 +78,25 @@ export const finalizeRegistration = createServerFn({ method: "POST" })
         montant_total: 5000,
         part_mutuelle: 4000,
         part_miprojet: 1000,
-        statut_paiement: "paye",
+        statut_paiement: "en_attente",
         operateur: data.paiement_methode,
-        reference_transaction: data.payment_reference,
-        paid_at: new Date().toISOString(),
+        reference_transaction: null,
+        paid_at: null,
       })
       .select()
       .single();
     if (subErr) throw new Error(subErr.message);
 
-    // 3) Trace MiPROJET privée
+
+    // 3) Trace MiPROJET privée (initialement en attente jusqu'à confirmation du paiement)
     await supabaseAdmin.from("transactions_miprojet").insert({
       subscription_id: sub.id,
       montant: 1000,
       statut: "en_attente",
-      reference: data.payment_reference,
+      reference: null,
     });
 
-    // 4) Notifications (SMS + WhatsApp + Email)
+    // 4) Notification d'accueil uniquement (pas de "payment_confirmed" tant que le webhook n'a pas confirmé)
     const baseUrl = "https://mugec-ci.ivoireprojet.com";
     const ctx = {
       prenoms: member.prenoms,
@@ -104,25 +107,13 @@ export const finalizeRegistration = createServerFn({ method: "POST" })
       member_url: `${baseUrl}/membre`,
       montant: 5000,
       operateur: data.paiement_methode,
-      reference: data.payment_reference,
     } as const;
 
     try {
       const { dispatchNotification } = await import("./notifications.functions");
-      // exécuter localement (handler)
       await dispatchNotification({
         data: {
-          event: "registration_validated",
-          memberId: member.id,
-          userId,
-          to: { email: member.email ?? undefined, phone: member.telephone ?? undefined, whatsapp: member.telephone ?? undefined },
-          channels: ["email", "sms", "whatsapp"],
-          context: ctx,
-        },
-      });
-      await dispatchNotification({
-        data: {
-          event: "payment_confirmed",
+          event: "registration_pending_payment",
           memberId: member.id,
           userId,
           to: { email: member.email ?? undefined, phone: member.telephone ?? undefined, whatsapp: member.telephone ?? undefined },
@@ -133,6 +124,7 @@ export const finalizeRegistration = createServerFn({ method: "POST" })
     } catch (e) {
       console.error("notif dispatch failed", e);
     }
+
 
     return { member, subscription: sub };
   });
