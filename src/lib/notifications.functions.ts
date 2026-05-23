@@ -75,6 +75,7 @@ async function sendEmail(to: string, subject: string, body: string) {
 
 /** Déclenche l’envoi multi-canal d’un événement basé sur les templates. */
 export const dispatchNotification = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input) =>
     z
       .object({
@@ -93,8 +94,35 @@ export const dispatchNotification = createServerFn({ method: "POST" })
       })
       .parse(input),
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context: ctx }) => {
     const { event, memberId, userId, to, channels, context } = data;
+    // Authorization: caller must be admin OR be sending to their own user/member record
+    const callerId = ctx.userId;
+    const isSelfUser = userId && userId === callerId;
+    let isSelfMember = false;
+    if (!isSelfUser && memberId) {
+      const { data: m } = await supabaseAdmin
+        .from("members")
+        .select("user_id")
+        .eq("id", memberId)
+        .maybeSingle();
+      isSelfMember = m?.user_id === callerId;
+    }
+    if (!isSelfUser && !isSelfMember) {
+      const { data: roles } = await supabaseAdmin
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", callerId);
+      const adminRoles = new Set([
+        "super_admin","admin_national","admin_regional","admin_local","agent_saisie",
+        "president","secretaire_general","tresorier_national","commissaire_comptes",
+        "directeur_executif","comite_controle","conseil_sages","secretaire_regional",
+        "tresorier_regional","delegue_section",
+      ]);
+      const isAdmin = (roles ?? []).some((r) => adminRoles.has(String(r.role)));
+      if (!isAdmin) throw new Error("Forbidden: admin role required");
+    }
+
 
     const { data: templates, error } = await supabaseAdmin
       .from("notification_templates")
