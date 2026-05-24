@@ -91,19 +91,30 @@ function Page() {
     } catch { /* ignore */ }
   }, []);
 
-  // Persistance automatique locale + serveur
+  // Persistance automatique locale + serveur (avec device fingerprint requis par RLS)
   useEffect(() => {
     const t = setTimeout(() => {
       try { localStorage.setItem(DRAFT_KEY, JSON.stringify(data)); } catch { /* ignore */ }
       if (isSupabaseConfigured && data.email && data.email.includes("@")) {
-        supabase.from("registration_drafts").upsert(
-          { email: data.email.toLowerCase(), telephone: data.telephone ?? null, nom: data.nom ?? null, prenoms: data.prenoms ?? null, step, data },
-          { onConflict: "email" },
-        ).then(() => { /* noop */ });
+        let fp = "";
+        try {
+          fp = localStorage.getItem("mugec_device_fp") ?? "";
+          if (!fp) {
+            fp = (crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`) + "-" + (navigator.userAgent.length);
+            localStorage.setItem("mugec_device_fp", fp);
+          }
+        } catch { /* ignore */ }
+        if (fp.length >= 8) {
+          supabase.from("registration_drafts").upsert(
+            { email: data.email.toLowerCase(), telephone: data.telephone ?? null, nom: data.nom ?? null, prenoms: data.prenoms ?? null, step, data, device_fingerprint: fp },
+            { onConflict: "email" },
+          ).then(() => { /* noop */ });
+        }
       }
     }, 800);
     return () => clearTimeout(t);
   }, [data, step]);
+
 
   const upd = (k: keyof FormData, v: string) => setData((d) => ({ ...d, [k]: v }));
   const val = (k: keyof FormData) => (data[k] ?? "") as string;
