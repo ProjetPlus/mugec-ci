@@ -260,18 +260,19 @@ export async function generateFicheAdhesionPDF(d: DraftData): Promise<Blob> {
 // ────────────────────────────────────────────────────────────────────────────
 export async function generateAutorisationPrelevementPDF(d: DraftData): Promise<Blob> {
   const pdf = new jsPDF({ unit: "mm", format: "a4" });
-  const logo = await loadImage(logoUrl);
+  const [wm, logo] = await Promise.all([loadImage(watermarkUrl), loadImage(logoUrl)]);
   drawHeader(pdf, logo);
+  drawWatermark(pdf, wm, 0.10);
 
   pdf.setFont("times", "bold");
   pdf.setFontSize(15);
   pdf.setTextColor(0, 0, 0);
-  pdf.text("ENGAGEMENT ET AUTORISATION DE PRÉLÈVEMENT", 105, 40, { align: "center" });
+  pdf.text("ENGAGEMENT ET AUTORISATION DE PRÉLÈVEMENT", 105, 52, { align: "center" });
   pdf.setLineWidth(0.4);
-  pdf.line(42, 42, 168, 42);
+  pdf.line(42, 54, 168, 54);
 
   const L = 22, R = 188;
-  let y = 56;
+  let y = 68;
 
   // Identification
   pdf.setFont("times", "bold"); pdf.setFontSize(12);
