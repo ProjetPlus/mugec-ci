@@ -63,18 +63,13 @@ function setOpacity(pdf: jsPDF, opacity: number) {
 }
 
 function drawHeader(pdf: jsPDF, logo: string) {
-  // Logo + ligne signature
-  pdf.addImage(logo, "PNG", 15, 10, 38, 12, undefined, "FAST");
-  pdf.setTextColor(BRAND_BLUE[0], BRAND_BLUE[1], BRAND_BLUE[2]);
-  pdf.setFont("times", "italic");
-  pdf.setFontSize(10.5);
-  pdf.text(
-    "Mutuelle Générale du Personnel des Collectivités Territoriales de Côte d'Ivoire",
-    58, 18,
-  );
-  pdf.setDrawColor(BRAND_BLUE[0], BRAND_BLUE[1], BRAND_BLUE[2]);
-  pdf.setLineWidth(0.6);
-  pdf.line(58, 22, 195, 22);
+  // Logo officiel (contient déjà le nom + sous-titre + filet bleu).
+  // Format source ≈ 1920×500 → ratio ~3.84. Largeur 180mm × hauteur ~47mm.
+  const pageW = pdf.internal.pageSize.getWidth();
+  const w = 180;
+  const h = 28;
+  const x = (pageW - w) / 2;
+  pdf.addImage(logo, "PNG", x, 8, w, h, undefined, "FAST");
 }
 
 function drawFooter(pdf: jsPDF) {
