@@ -149,13 +149,13 @@ export async function generateFicheAdhesionPDF(d: DraftData): Promise<Blob> {
   pdf.setFont("times", "bold");
   pdf.setFontSize(18);
   pdf.setTextColor(0, 0, 0);
-  pdf.text("FICHE D'ADHÉSION A LA MUGEC- CI.", 105, 35, { align: "center" });
+  pdf.text("FICHE D'ADHÉSION A LA MUGEC- CI.", 105, 48, { align: "center" });
   pdf.setLineWidth(0.4);
-  pdf.line(55, 37, 155, 37);
+  pdf.line(55, 50, 155, 50);
 
   const L = 18;   // marge gauche
   const R = 195;  // fin de ligne droite
-  let y = 50;
+  let y = 62;
 
   // 1. IDENTIFICATION
   sectionTitle(pdf, "1", "IDENTIFICATION DE L'ADHÉRENT", L, y); y += 7;
